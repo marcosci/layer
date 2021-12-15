@@ -23,12 +23,10 @@ tilt_map <- function(data,
                      x_shift = 0, 
                      y_shift = 0) {
   
-  if(!any(class(sf) == "sf")){
-    data <- stars::st_as_stars(landscape)
-    data <- st_as_sf(data)
+  if(!any(class(data) %in% c("sf", "sfg"))){
+    data <- stars::st_as_stars(data)
+    data <- sf::st_as_sf(data)
   }
-  
-  data=st_as_sf(data)
   
   shear_matrix <- function (x) { 
     matrix(c(x_stretch, y_stretch, x_tilt, y_tilt), 2, 2) 
@@ -38,9 +36,7 @@ tilt_map <- function(data,
     matrix(c(cos(x), sin(x), -sin(x), cos(x)), 2, 2) 
   }
   
-  data %>% 
-    dplyr::mutate(
-      geometry = 
-        .$geometry * shear_matrix() * rotate_matrix(pi / 20) + c(x_shift, y_shift)
-    )
+  data$geometry <- data$geometry * shear_matrix() * rotate_matrix(pi / 20) + c(x_shift, y_shift)
+  
+  data
 }
