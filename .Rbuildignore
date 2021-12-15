@@ -1,2 +1,9 @@
 ^layer\.Rproj$
 ^\.Rproj\.user$
+^\.github$
+^LICENSE\.md$
+^CODE_OF_CONDUCT\.md$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^data-raw$
