@@ -1,9 +1,9 @@
 Package: layer
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Title: layer tilts your maps and turns them into ggplots
+Version: 0.0.1
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
+    c(person("Marco", "Sciaini", , "marco@kaldera.dev", role = c("aut", "cre")),
+      person("Cédric", "Scherer", , "xxx@xxx.xxx", role = c("cre"))
 Description: What the package does (one paragraph).
 License: CC0
 Encoding: UTF-8
