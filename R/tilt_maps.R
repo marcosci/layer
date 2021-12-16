@@ -1,7 +1,6 @@
 #' Tilt raster and sf data 
 #'
-#' 
-#' Code adopted from https://www.mzes.uni-mannheim.de/socialsciencedatalab/article/geospatial-data/.
+#' Tilt and shift maps in any direction.#' 
 #' 
 #' @param data sf or terra/stars/raster object.
 #' @param x_stretch Stretch in x dimension
@@ -10,6 +9,10 @@
 #' @param y_tilt Tilt in y dimension
 #' @param x_shift Shift in x dimension
 #' @param x_shift Shift in y dimension
+#' 
+#' @details 
+#' Code adopted from https://www.mzes.uni-mannheim.de/socialsciencedatalab/article/geospatial-data/.
+#' 
 #' @return sf 
 #' @export
 #' @examples

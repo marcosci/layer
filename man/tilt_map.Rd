@@ -31,6 +31,9 @@ tilt_map(
 sf
 }
 \description{
+Tilt and shift maps in any direction.#'
+}
+\details{
 Code adopted from https://www.mzes.uni-mannheim.de/socialsciencedatalab/article/geospatial-data/.
 }
 \examples{

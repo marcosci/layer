@@ -33,7 +33,7 @@ devtools::install_github("marcosci/layer")
 
 This is a basic example which shows you how to solve a common problem:
 
-```{r example, echo = FALSE}
+```{r example, messages = FALSE}
 library(layer)
 library(ggplot2)
 library(scico)
