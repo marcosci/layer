@@ -4,10 +4,12 @@
 \alias{plot_tiltedmaps}
 \title{Tilt raster and sf data}
 \usage{
-plot_tiltedmaps(map_list)
+plot_tiltedmaps(map_list, layer)
 }
 \arguments{
-\item{data}{sf or terra/stars/raster object.}
+\item{map_list}{sf or terra/stars/raster object.}
+
+\item{layer}{vector or list of names of each column in tilted sf object that should be used for coloring}
 }
 \value{
 ggplot
@@ -24,5 +26,6 @@ tilt_landscape_2 <- tilt_map(landscape_2, x_shift = 50, y_shift = 50)
 map_list <- list(tilt_landscape_1, tilt_landscape_2)
 
 # plot
-plot_tiltedmaps(map_list)
+plot_tiltedmaps(map_list, "layer")
+
 }

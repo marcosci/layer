@@ -2,3 +2,8 @@
 
 export(plot_tiltedmaps)
 export(tilt_map)
+importFrom(ggplot2,aes)
+importFrom(ggplot2,geom_sf)
+importFrom(ggplot2,ggplot)
+importFrom(ggplot2,theme)
+importFrom(ggplot2,theme_void)

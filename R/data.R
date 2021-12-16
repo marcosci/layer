@@ -3,7 +3,7 @@
 #' Random curd neutral landscape model.
 #'
 #' @format raster object
-#' 
+#'
 #' @source NLMR package
 "landscape_1"
 
@@ -12,7 +12,7 @@
 #' Fractional Brownian motion neutral landscape model.
 #'
 #' @format raster object
-#' 
+#'
 #' @source NLMR package
 "landscape_2"
 
@@ -21,7 +21,7 @@
 #' Distance gradient neutral landscape model.
 #'
 #' @format raster object
-#' 
+#'
 #' @source NLMR package
 "landscape_3"
 
@@ -30,6 +30,6 @@
 #' Random curd neutral landscape model.
 #'
 #' @format raster object
-#' 
+#'
 #' @source NLMR package
 "landscape_points"

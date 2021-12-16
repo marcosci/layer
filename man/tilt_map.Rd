@@ -25,7 +25,9 @@ tilt_map(
 
 \item{y_tilt}{Tilt in y dimension}
 
-\item{x_shift}{Shift in y dimension}
+\item{x_shift}{Shift in x dimension}
+
+\item{y_shift}{Shift in y dimension}
 }
 \value{
 sf
