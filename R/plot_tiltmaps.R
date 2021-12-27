@@ -13,6 +13,7 @@
 #'
 #' @return ggplot
 #' @importFrom ggplot2 ggplot geom_sf aes theme theme_void
+#' @import ggnewscale
 #' @export
 #' @examples
 #' # tilt data
