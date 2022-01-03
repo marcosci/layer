@@ -4,7 +4,8 @@
 #'
 #' @param map_list sf or terra/stars/raster object.
 #' @param layer vector or list of names of each column in tilted sf object that should be used for coloring
-#' @param palette vector of palettes provided by the {viridis} and {scico} packages for rasters or a single color for points or linestrings
+#' @param palette vector of palettes provided by the {viridis} and {scico} packages for rasters
+#' @param palette  a single color applied multiple times or a vector of color strings for points or linestrings
 #' @param direction vector of directions for {viridis} and {scico} color palettes
 #' @param begin vector of the of the start of interval the palette to sample colours from for {viridis} and {scico} color palettes
 #' @param end vector of the of the end of interval the palette to sample colours from for {viridis} and {scico} color palettes
@@ -26,15 +27,23 @@
 #' # plot
 #' plot_tiltedmaps(map_list, "layer", palette = "turbo")
 
-plot_tiltedmaps <- function(map_list, layer, palette = "viridis", direction = 1, begin = 0, end = 1, alpha = 1) {
+plot_tiltedmaps <- function(map_list, layer, palette = "viridis", color = "grey50", direction = 1, begin = 0, end = 1, alpha = 1) {
   
   
   ## checks ----
+  if(length(layer) == 1) layer <- rep(layer, length(map_list))
+  if(length(alpha) == 1) alpha <- rep(alpha, length(map_list))
+  
+  # fill in palettes and colors
   if(length(palette) == 1) palette <- rep(palette, length(map_list))
+  if(length(color) == 1) color <- rep(color, length(map_list))
+  
+  test <- sapply(map_list,sf::st_geometry_type, by_geometry = FALSE)
+  
+  palette[!c(test %in% "POLYGON")] <- NA
+  color[c(test %in% "POLYGON")] <- NA
   
   #if(!palette %in% c("viridis", "inferno", "magma", "plasma", "cividis", "mako", "rocket", "turbo", letters[1:9], scico::scico_palette_names())) stop("palette should be a palette name from the {viridis} or {scico} package.")
-  
-  if(length(layer) == 1) layer <- rep(layer, length(map_list))
   
   
   ## plot ----
@@ -46,19 +55,19 @@ plot_tiltedmaps <- function(map_list, layer, palette = "viridis", direction = 1,
     ) +
     {
       if (palette[1] %in% c("viridis", "inferno", "magma", "plasma", "cividis", "mako", "rocket", "turbo", letters[1:9])) 
-        scale_fill_viridis_c(option = palette[1], direction = direction, begin = begin, end = end, alpha = alpha, guide = "none")
+        scale_fill_viridis_c(option = palette[1], direction = direction, begin = begin, end = end, alpha = alpha[1], guide = "none")
     } +
     {
       if (palette[1] %in% c("viridis", "inferno", "magma", "plasma", "cividis", "mako", "rocket", "turbo", letters[1:9])) 
-        scale_color_viridis_c(option = palette[1], direction = direction, begin = begin, end = end, alpha = alpha, guide = "none")
+        scale_color_viridis_c(option = palette[1], direction = direction, begin = begin, end = end, alpha = alpha[1], guide = "none")
     } +
     {
       if (palette[1] %in% scico::scico_palette_names()) 
-        scico::scale_fill_scico(palette = palette[1], direction = direction, begin = begin, end = end, alpha = alpha, guide = "none")
+        scico::scale_fill_scico(palette = palette[1], direction = direction, begin = begin, end = end, alpha = alpha[1], guide = "none")
     } +
     {
       if (palette[1] %in% scico::scico_palette_names()) 
-        scico::scale_color_scico(palette = palette[1], direction = direction, begin = begin, end = end, alpha = alpha, guide = "none")
+        scico::scale_color_scico(palette = palette[1], direction = direction, begin = begin, end = end, alpha = alpha[1], guide = "none")
     }
   
   for (i in seq_along(map_list)[-1]) {
@@ -71,19 +80,19 @@ plot_tiltedmaps <- function(map_list, layer, palette = "viridis", direction = 1,
         ) +
         {
           if (palette[i] %in% c("viridis", "inferno", "magma", "plasma", "cividis", "mako", "rocket", "turbo", letters[1:9])) 
-            scale_fill_viridis_c(option = palette[i], direction = direction, begin = begin, end = end, alpha = alpha, guide = "none")
+            scale_fill_viridis_c(option = palette[i], direction = direction, begin = begin, end = end, alpha = alpha[i], guide = "none")
         } +
         {
           if (palette[i] %in% c("viridis", "inferno", "magma", "plasma", "cividis", "mako", "rocket", "turbo", letters[1:9])) 
-            scale_color_viridis_c(option = palette[i], direction = direction, begin = begin, end = end, alpha = alpha, guide = "none")
+            scale_color_viridis_c(option = color[i], direction = direction, begin = begin, end = end, alpha = alpha[i], guide = "none")
         } +
         {
           if (palette[i] %in% scico::scico_palette_names()) 
-            scico::scale_fill_scico(palette = palette[i], direction = direction, begin = begin, end = end, alpha = alpha, guide = "none")
+            scico::scale_fill_scico(palette = palette[i], direction = direction, begin = begin, end = end, alpha = alpha[i], guide = "none")
         } +
         {
           if (palette[i] %in% scico::scico_palette_names()) 
-            scico::scale_color_scico(palette = palette[i], direction = direction, begin = begin, end = end, alpha = alpha, guide = "none")
+            scico::scale_color_scico(palette = color[i], direction = direction, begin = begin, end = end, alpha = alpha[i], guide = "none")
         } +
         ggnewscale::new_scale_fill() +
         ggnewscale::new_scale_color()      
@@ -91,7 +100,7 @@ plot_tiltedmaps <- function(map_list, layer, palette = "viridis", direction = 1,
       map_tilt <- map_tilt +
         geom_sf(
           data = map_list[[i]],
-          color = palette[i],
+          color = color[i],
           alpha = alpha[i]
         )
     }

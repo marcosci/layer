@@ -8,6 +8,7 @@ plot_tiltedmaps(
   map_list,
   layer,
   palette = "viridis",
+  color = "grey50",
   direction = 1,
   begin = 0,
   end = 1,
@@ -19,7 +20,7 @@ plot_tiltedmaps(
 
 \item{layer}{vector or list of names of each column in tilted sf object that should be used for coloring}
 
-\item{palette}{vector of palettes provided by the {viridis} and {scico} packages for rasters or a single color for points or linestrings}
+\item{palette}{a single color applied multiple times or a vector of color strings for points or linestrings}
 
 \item{direction}{vector of directions for {viridis} and {scico} color palettes}
 
@@ -44,5 +45,5 @@ tilt_landscape_2 <- tilt_map(landscape_2, x_shift = 50, y_shift = 50)
 map_list <- list(tilt_landscape_1, tilt_landscape_2)
 
 # plot
-plot_tiltedmaps(map_list, "layer")
+plot_tiltedmaps(map_list, "layer", palette = "turbo")
 }

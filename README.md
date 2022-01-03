@@ -36,7 +36,16 @@ map_list <- list(tilt_landscape_1, tilt_landscape_2, tilt_landscape_3, tilt_land
 
 plot_tiltedmaps(map_list, 
                 c("layer", "layer", "layer", NA), 
-                palette = c("bilbao", "mako", "rocket", "grey40"))
+                palette = c("bilbao", "mako", "rocket", NA),
+                color = "grey40")
+#> Scale for 'fill' is already present. Adding another scale for 'fill', which
+#> will replace the existing scale.
+#> Warning in viridisLite::viridis(n, alpha, begin, end, direction, option): Option
+#> 'NA' does not exist. Defaulting to 'viridis'.
+#> Scale for 'colour' is already present. Adding another scale for 'colour',
+#> which will replace the existing scale.
+#> Warning in viridisLite::viridis(n, alpha, begin, end, direction, option): Option
+#> 'NA' does not exist. Defaulting to 'viridis'.
 ```
 
 <img src="man/figures/README-example-1.png" width="100%" />
