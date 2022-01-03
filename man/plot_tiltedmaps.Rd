@@ -4,12 +4,30 @@
 \alias{plot_tiltedmaps}
 \title{Tilt raster and sf data}
 \usage{
-plot_tiltedmaps(map_list, layer)
+plot_tiltedmaps(
+  map_list,
+  layer,
+  palette = "viridis",
+  direction = 1,
+  begin = 0,
+  end = 1,
+  alpha = 1
+)
 }
 \arguments{
 \item{map_list}{sf or terra/stars/raster object.}
 
 \item{layer}{vector or list of names of each column in tilted sf object that should be used for coloring}
+
+\item{palette}{vector of palettes provided by the {viridis} and {scico} packages for rasters or a single color for points or linestrings}
+
+\item{direction}{vector of directions for {viridis} and {scico} color palettes}
+
+\item{begin}{vector of the of the start of interval the palette to sample colours from for {viridis} and {scico} color palettes}
+
+\item{end}{vector of the of the end of interval the palette to sample colours from for {viridis} and {scico} color palettes}
+
+\item{alpha}{vector of opacity for {viridis} and {scico} color palettes}
 }
 \value{
 ggplot
@@ -27,5 +45,4 @@ map_list <- list(tilt_landscape_1, tilt_landscape_2)
 
 # plot
 plot_tiltedmaps(map_list, "layer")
-
 }
