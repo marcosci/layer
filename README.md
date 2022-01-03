@@ -24,14 +24,8 @@ This is a basic example which shows you how to solve a common problem:
 
 ``` r
 library(layer)
-library(ggplot2)
-library(scico)
 
 tilt_landscape_1 <- tilt_map(landscape_1)
-#> Registered S3 methods overwritten by 'stars':
-#>   method             from
-#>   st_bbox.SpatRaster sf  
-#>   st_crs.SpatRaster  sf
 #> Loading required package: raster
 #> Loading required package: sp
 tilt_landscape_2 <- tilt_map(landscape_2, x_shift = 50, y_shift = 50)
@@ -40,7 +34,9 @@ tilt_landscape_points <- tilt_map(landscape_points, x_shift = 150, y_shift = 150
 
 map_list <- list(tilt_landscape_1, tilt_landscape_2, tilt_landscape_3, tilt_landscape_points)
 
-plot_tiltedmaps(map_list, c("layer", "layer", "layer", NA))
+plot_tiltedmaps(map_list, 
+                c("layer", "layer", "layer", NA), 
+                palette = c("bilbao", "mako", "rocket", "grey40"))
 ```
 
 <img src="man/figures/README-example-1.png" width="100%" />

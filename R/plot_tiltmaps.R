@@ -24,21 +24,44 @@
 #' map_list <- list(tilt_landscape_1, tilt_landscape_2)
 #'
 #' # plot
-#' plot_tiltedmaps(map_list, "layer")
+#' plot_tiltedmaps(map_list, "layer", palette = "turbo")
 
 plot_tiltedmaps <- function(map_list, layer, palette = "viridis", direction = 1, begin = 0, end = 1, alpha = 1) {
+  
+  
+  ## checks ----
+  if(length(palette) == 1) palette <- rep(palette, length(map_list))
   
   #if(!palette %in% c("viridis", "inferno", "magma", "plasma", "cividis", "mako", "rocket", "turbo", letters[1:9], scico::scico_palette_names())) stop("palette should be a palette name from the {viridis} or {scico} package.")
   
   if(length(layer) == 1) layer <- rep(layer, length(map_list))
+  
+  
+  ## plot ----
   map_tilt <- ggplot() +
     geom_sf(
       data = map_list[[1]],
       aes_string(fill = layer[[1]],
                  color = layer[[1]]), size = 0.01
-    )
+    ) +
+    {
+      if (palette[1] %in% c("viridis", "inferno", "magma", "plasma", "cividis", "mako", "rocket", "turbo", letters[1:9])) 
+        scale_fill_viridis_c(option = palette[1], direction = direction, begin = begin, end = end, alpha = alpha, guide = "none")
+    } +
+    {
+      if (palette[1] %in% c("viridis", "inferno", "magma", "plasma", "cividis", "mako", "rocket", "turbo", letters[1:9])) 
+        scale_color_viridis_c(option = palette[1], direction = direction, begin = begin, end = end, alpha = alpha, guide = "none")
+    } +
+    {
+      if (palette[1] %in% scico::scico_palette_names()) 
+        scico::scale_fill_scico(palette = palette[1], direction = direction, begin = begin, end = end, alpha = alpha, guide = "none")
+    } +
+    {
+      if (palette[1] %in% scico::scico_palette_names()) 
+        scico::scale_color_scico(palette = palette[1], direction = direction, begin = begin, end = end, alpha = alpha, guide = "none")
+    }
   
-  for (i in seq_along(map_list)) {
+  for (i in seq_along(map_list)[-1]) {
     if(!is.na(layer[[i]])){
       map_tilt <- map_tilt +
         geom_sf(

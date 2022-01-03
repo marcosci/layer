@@ -45,5 +45,5 @@ map_list <- list(tilt_landscape_1, tilt_landscape_2, tilt_landscape_3, tilt_land
 
 plot_tiltedmaps(map_list, 
                 c("layer", "layer", "layer", NA), 
-                palette = c("bilbao", "mako", "rocket", "plasma"))
+                palette = c("bilbao", "mako", "rocket", "grey40"))
 ```
