@@ -38,6 +38,8 @@ tilt_map <- function(data,
   }
 
   data$geometry <- data$geometry * shear_matrix() * rotate_matrix(pi / 20) + c(x_shift, y_shift)
-
-  data
+  names(data)[1] <- "value"
+  
+  return(data)
+  
 }
