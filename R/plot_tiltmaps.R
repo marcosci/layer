@@ -31,7 +31,7 @@
 plot_tiltedmaps <- function(map_list, layer = NA, palette = "viridis", color = "grey50", direction = 1, begin = 0, end = 1, alpha = 1) {
   
   ## checks ----
-  if(is.na(layer)) layer <- "value"
+  if(all(is.na(layer))) layer <- "value"
   if(length(layer) == 1) layer <- rep(layer, length(map_list))
   if(length(alpha) == 1) alpha <- rep(alpha, length(map_list))
   if(length(direction) == 1) direction <- rep(direction, length(map_list))
