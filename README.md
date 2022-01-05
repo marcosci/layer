@@ -20,6 +20,10 @@ different environmental layers for a geographical region. Tilting maps
 and layering them allows to easily draw visual correlations between
 these environmental layers.
 
+Something in the line of:
+
+![](./man/figures/example.jpg_large)<!-- -->
+
 ## Installation
 
 You can install the development version of layer from

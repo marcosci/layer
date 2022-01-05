@@ -30,6 +30,12 @@ status](https://github.com/marcosci/layer/workflows/R-CMD-check/badge.svg)](http
 The goal of `layer` is to simplify the whole process of creating stacked tilted maps, that are often used in scientific publications to show different environmental
 layers for a geographical region. Tilting maps and layering them allows to easily draw visual correlations between these environmental layers.
 
+Something in the line of:
+
+```{r echo=FALSE}
+knitr::include_graphics(rep("./man/figures/example.jpg_large"))
+```
+
 ## Installation
 
 You can install the development version of layer from [GitHub](https://github.com/) with:
