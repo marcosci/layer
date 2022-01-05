@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# layer
+# layer <a><img src='man/figures/logo.svg' align="right" height=210 width=182/></a>
 
 <!-- badges: start -->
 <!-- badges: end -->
@@ -42,7 +42,7 @@ plot_tiltedmaps(map_list,
 #> only the first element will be used
 ```
 
-<img src="man/figures/README-example-1.png" width="100%" />
+<img src="README-example-1.png" width="672" />
 
 ### More advanced examples
 
@@ -50,13 +50,14 @@ Some more realistic looking data (DEM, drought and precipitation for
 continental USA):
 
 ``` r
-tilt_landscape_1 <- tilt_map(dem_usa)
-tilt_landscape_2 <- tilt_map(drought_usa, x_shift = 0, y_shift = 25)
-tilt_landscape_3 <- tilt_map(prec_usa, x_shift = 0, y_shift = 50)
+tilt_landscape_1 <- tilt_map(dem_usa, y_tilt = 3)
+tilt_landscape_2 <- tilt_map(drought_usa, y_tilt = 3, x_shift = 15, y_shift = 25)
+tilt_landscape_3 <- tilt_map(prec_usa,y_tilt = 3,  x_shift = 30, y_shift = 50)
+tilt_landscape_4 <- tilt_map(fire_usa,y_tilt = 3, x_shift = 45, y_shift = 65)
 
-map_list <- list(tilt_landscape_1, tilt_landscape_2, tilt_landscape_3)
+map_list <- list(tilt_landscape_1, tilt_landscape_2, tilt_landscape_3, tilt_landscape_4)
 
-plot_tiltedmaps(map_list, palette =c("tofino", "rocket", "mako"), direction = c(-1, 1, 1)) 
+plot_tiltedmaps(map_list, palette =c("tofino", "rocket", "mako", "magma"), direction = c(-1, 1, 1, 1)) 
 ```
 
-<img src="./man/figures/README-figure-real.png" width="100%" />
+![](./man/figures/README-figure-real.png)<!-- -->
