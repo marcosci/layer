@@ -4,9 +4,21 @@
 # layer <a><img src='man/figures/logo.svg' align="right" height=210 width=182/></a>
 
 <!-- badges: start -->
+
+[![R build
+status](https://github.com/marcosci/layer/workflows/R-CMD-check/badge.svg)](https://github.com/marcosci/layer/actions?query=workflow%3AR-CMD-check)
+[![Project Status:
+Active](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/layer)](https://cran.r-project.org/web/packages/layer/)
+[![CRAN
+Downloads](https://cranlogs.r-pkg.org/badges/grand-total/layer?color=orange)](https://cran.r-project.org/package=layer)
 <!-- badges: end -->
 
-The goal of layer is to …
+The goal of `layer` is to simplify the whole process of creating stacked
+tilted maps, that are often used in scientific publications to show
+different environmental layers for a geographical region. Tilting maps
+and layering them allows to easily draw visual correlations between
+these environmental layers.
 
 ## Installation
 
