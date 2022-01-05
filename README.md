@@ -76,4 +76,9 @@ map_list <- list(tilt_landscape_1, tilt_landscape_2, tilt_landscape_3, tilt_land
 plot_tiltedmaps(map_list, palette =c("tofino", "rocket", "mako", "magma"), direction = c(-1, 1, 1, 1)) 
 ```
 
-![](./man/figures/README-figure-real.png)<!-- -->
+![](./man/figures/README-figure-real.png)<!-- --> ## Code of Conduct
+
+Please note that the `layer` project is released with a [Contributor
+Code of
+Conduct](https://contributor-covenant.org/version/2/0/CODE_OF_CONDUCT.html).
+By contributing to this project, you agree to abide by its terms.
