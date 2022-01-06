@@ -37,7 +37,7 @@ tilt_map <- function(data,
     matrix(c(cos(x), sin(x), -sin(x), cos(x)), 2, 2)
   }
 
-  data$geometry <- data$geometry * shear_matrix() * rotate_matrix(pi / 20) + c(x_shift, y_shift)
+  st_geometry(data) <- st_geometry(data) * shear_matrix() * rotate_matrix(pi / 20) + c(x_shift, y_shift)
   
   if(length(names(data)) > 1) names(data)[1] <- "value"
   
