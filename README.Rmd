@@ -67,7 +67,7 @@ plot_tiltedmaps(map_list,
 
 ### More advanced examples
 
-Some more realistic looking data (DEM, drought and precipitation for continental USA): 
+Some more realistic looking data (DEM, drought, precipitation, and wildfires for continental USA): 
 
 ```{r messages = FALSE, eval= FALSE}
 tilt_landscape_1 <- tilt_map(dem_usa, y_tilt = 3)

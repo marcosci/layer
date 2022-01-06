@@ -42,8 +42,8 @@ This is a basic example which shows you how to solve a common problem:
 library(layer)
 
 tilt_landscape_1 <- tilt_map(landscape_1)
-#> Loading required package: raster
-#> Loading required package: sp
+#> Lade nötiges Paket: raster
+#> Lade nötiges Paket: sp
 tilt_landscape_2 <- tilt_map(landscape_2, x_shift = 50, y_shift = 50)
 tilt_landscape_3 <- tilt_map(landscape_3, x_shift = 100, y_shift = 100)
 tilt_landscape_points <- tilt_map(landscape_points, x_shift = 150, y_shift = 150)
@@ -54,16 +54,14 @@ plot_tiltedmaps(map_list,
                 layer = c("value", "value", "value", NA),
                 palette = c("bilbao", "mako", "rocket", "turbo"),
                 color = "grey40")
-#> Warning in if (is.na(layer)) layer <- "value": the condition has length > 1 and
-#> only the first element will be used
 ```
 
-<img src="./man/figures/README-example-1.png" width="672" />
+<img src="README-example-1.png" width="672" />
 
 ### More advanced examples
 
-Some more realistic looking data (DEM, drought and precipitation for
-continental USA):
+Some more realistic looking data (DEM, drought, precipitation, and
+wildfires for continental USA):
 
 ``` r
 tilt_landscape_1 <- tilt_map(dem_usa, y_tilt = 3)
@@ -76,7 +74,9 @@ map_list <- list(tilt_landscape_1, tilt_landscape_2, tilt_landscape_3, tilt_land
 plot_tiltedmaps(map_list, palette =c("tofino", "rocket", "mako", "magma"), direction = c(-1, 1, 1, 1)) 
 ```
 
-![](./man/figures/README-figure-real.png)<!-- --> ## Code of Conduct
+![](man/figures/README-figure-real.png)<!-- -->
+
+## Code of Conduct
 
 Please note that the `layer` project is released with a [Contributor
 Code of
