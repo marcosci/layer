@@ -49,7 +49,7 @@ devtools::install_github("marcosci/layer")
 
 This is a basic example which shows you how to solve a common problem:
 
-```{r example, messages = FALSE}
+```{r example, echo=TRUE, messages=FALSE}
 library(layer)
 
 tilt_landscape_1 <- tilt_map(landscape_1)

@@ -58,7 +58,7 @@ plot_tiltedmaps(map_list,
 #> only the first element will be used
 ```
 
-<img src="README-example-1.png" width="672" />
+<img src="./man/figures/README-example-1.png" width="672" />
 
 ### More advanced examples
 
