@@ -14,6 +14,7 @@
 #' Code adopted from https://www.mzes.uni-mannheim.de/socialsciencedatalab/article/geospatial-data/.
 #'
 #' @return sf
+#' @importFrom magrittr "%>%"
 #' @export
 #' @examples
 #' tilt_map(landscape_1)
@@ -36,8 +37,28 @@ tilt_map <- function(data,
   rotate_matrix <- function(x) {
     matrix(c(cos(x), sin(x), -sin(x), cos(x)), 2, 2)
   }
-
-  sf::st_geometry(data) <- sf::st_geometry(data) * shear_matrix() * rotate_matrix(pi / 20) + c(x_shift, y_shift)
+  
+  n_lists <- nrow(data)/5000
+  
+  chunking_polys <- data %>%
+    dplyr::group_by(group = (dplyr::row_number()-1) %/% (dplyr::n()/n_lists))%>%
+    tidyr::nest() %>% dplyr::pull(data)
+  
+  geom_func <- function(data, x_stretch, y_stretch, x_tilt, y_tilt, x_shift, y_shift){
+    sf::st_geometry(data) <- sf::st_geometry(data) * shear_matrix() * rotate_matrix(pi / 20) + c(x_shift, y_shift)
+    data <- data %>% sf::st_as_sf()
+  }
+  
+  proc_chunks <- furrr::future_map(chunking_polys, ~geom_func(data = .,
+                                                              x_stretch = x_stretch,
+                                                              y_stretch = y_stretch,
+                                                              x_tilt = x_tilt,
+                                                              y_tilt = y_tilt,
+                                                              x_shift = x_shift,
+                                                              y_shift = y_shift))
+  
+  
+  data <- proc_chunks %>% plyr::rbind.fill() %>% sf::st_as_sf()
   
   if(length(names(data)) > 1) names(data)[1] <- "value"
   

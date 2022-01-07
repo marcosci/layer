@@ -18,5 +18,9 @@ Imports:
     dplyr,
     scico,
     ggplot2,
-    ggnewscale
+    ggnewscale,
+    magrittr,
+    plyr,
+    tidyr,
+    furrr
 LazyData: true
