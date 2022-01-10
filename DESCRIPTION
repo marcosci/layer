@@ -22,5 +22,6 @@ Imports:
     ggnewscale,
     magrittr,
     tidyr,
-    furrr
+    furrr,
+    rgeos
 LazyData: true

@@ -85,7 +85,26 @@ create_outline <- function(outline_from, outline_to){
     outline_from <- sf::st_as_sf(outline_from)
   }
   
-  outline_shape <- sf::st_union(outline_from) |> sf::st_cast('LINESTRING')
+  if (!any(class(outline_to) %in% c("sf", "sfg"))) {
+    outline_to <- stars::st_as_stars(outline_to)
+    outline_to <- sf::st_as_sf(outline_to)
+  }
+  
+  outline_shape <- rgeos::gBuffer(sf::as_Spatial(outline_from), byid = FALSE, width = 0) 
+  outline_shape <- sf::st_as_sf(sf::st_cast(sf::st_as_sf(outline_shape), 'MULTILINESTRING'))
+  
+  current = attr(outline_shape, "sf_column")
+  names(outline_shape)[names(outline_shape)==current] = "geometry"
+  sf::st_geometry(outline_shape) = "geometry"
+  
+  if(length(names(outline_to)) > 1) {
+    
+    outline_names <- names(outline_to)
+    outline_names <- outline_names[-which(outline_names == "geometry")]
+    for(nm in outline_names){ 
+      outline_shape[paste0(nm)] <-NA
+      }
+  }
   
   rbind(
     outline_to,
