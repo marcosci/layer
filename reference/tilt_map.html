@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">layer</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,6 +53,7 @@
   y_tilt <span class="op">=</span> <span class="fl">1</span>,
   x_shift <span class="op">=</span> <span class="fl">0</span>,
   y_shift <span class="op">=</span> <span class="fl">0</span>,
+  boundary <span class="op">=</span> <span class="cn">NULL</span>,
   parallel <span class="op">=</span> <span class="cn">FALSE</span>
 <span class="op">)</span></code></pre></div>
     </div>
@@ -73,6 +74,8 @@
 <dd><p>Shift in x dimension</p></dd>
 <dt>y_shift</dt>
 <dd><p>Shift in y dimension</p></dd>
+<dt>boundary</dt>
+<dd><p>Another layer that is used to create a boundary that is drawn around the data</p></dd>
 <dt>parallel</dt>
 <dd><p><code>logical</code> to run in parallel. FALSE (default)</p></dd>
 </dl></div>
