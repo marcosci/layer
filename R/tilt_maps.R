@@ -60,7 +60,7 @@ tilt_map <- function(data,
                                           y_tilt = y_tilt,
                                           x_shift = x_shift,
                                           y_shift = y_shift)) %>% 
-    plyr::rbind.fill() %>% 
+    dplyr::bind_rows() %>% 
     sf::st_as_sf()
   
     } else {

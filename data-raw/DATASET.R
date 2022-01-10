@@ -2,20 +2,20 @@
 library(NLMR)
 library(sf)
 
-landscape_1 <- nlm_randomrectangularcluster(100, 100,
+landscape_1 <- nlm_randomrectangularcluster(50, 50,
   minl = 5,
   maxl = 10
 ) + 1
 
-landscape_2 <- nlm_fbm(100, 100) + 1
+landscape_2 <- nlm_fbm(50, 50) + 1
 
-landscape_3 <- nlm_distancegradient(100, 100, origin = c(1, 1, 1, 1)) + 1
+landscape_3 <- nlm_distancegradient(50, 50, origin = c(1, 1, 1, 1)) + 1
 
 # get parameters
 res <- raster::res(landscape_3)
 
 # random points in the center of the cells
-ptscell <- sample(1:length(landscape_3), 500, prob = landscape_3[], replace = TRUE)
+ptscell <- sample(1:length(landscape_3), 250, prob = landscape_3[], replace = TRUE)
 
 # get the centers
 center <- raster::xyFromCell(landscape_3, ptscell)
