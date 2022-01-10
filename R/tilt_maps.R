@@ -9,11 +9,13 @@
 #' @param y_tilt Tilt in y dimension
 #' @param x_shift Shift in x dimension
 #' @param y_shift Shift in y dimension
+#' @param parallel \code{logical} to run in parallel. FALSE (default)
 #'
 #' @details
 #' Code adopted from https://www.mzes.uni-mannheim.de/socialsciencedatalab/article/geospatial-data/.
 #'
 #' @return sf
+#' @importFrom magrittr "%>%"
 #' @export
 #' @examples
 #' tilt_map(landscape_1)
@@ -23,7 +25,9 @@ tilt_map <- function(data,
                      x_tilt = 0,
                      y_tilt = 1,
                      x_shift = 0,
-                     y_shift = 0) {
+                     y_shift = 0,
+                     parallel = FALSE) {
+  
   if (!any(class(data) %in% c("sf", "sfg"))) {
     data <- stars::st_as_stars(data)
     data <- sf::st_as_sf(data)
@@ -37,10 +41,37 @@ tilt_map <- function(data,
     matrix(c(cos(x), sin(x), -sin(x), cos(x)), 2, 2)
   }
 
-  sf::st_geometry(data) <- sf::st_geometry(data) * shear_matrix() * rotate_matrix(pi / 20) + c(x_shift, y_shift)
+  
+  if(parallel == TRUE){
+    
+  geom_func <- function(data, x_stretch, y_stretch, x_tilt, y_tilt, x_shift, y_shift){
+    sf::st_geometry(data) <- sf::st_geometry(data) * shear_matrix() * rotate_matrix(pi / 20) + c(x_shift, y_shift) 
+    data <- data %>% sf::st_as_sf()
+    }
+    
+  data <- data %>%
+    dplyr::group_by(group = (dplyr::row_number()-1) %/% (dplyr::n()/10))%>%
+    tidyr::nest() %>% 
+    dplyr::pull(data) %>%
+    furrr::future_map(~geom_func(data = .,
+                                          x_stretch = x_stretch,
+                                          y_stretch = y_stretch,
+                                          x_tilt = x_tilt,
+                                          y_tilt = y_tilt,
+                                          x_shift = x_shift,
+                                          y_shift = y_shift)) %>% 
+    plyr::rbind.fill() %>% 
+    sf::st_as_sf()
+  
+    } else {
+    
+    sf::st_geometry(data) <- sf::st_geometry(data) * shear_matrix() * rotate_matrix(pi / 20) + c(x_shift, y_shift)
+  
+    }
   
   if(length(names(data)) > 1) names(data)[1] <- "value"
   
   return(data)
   
 }
+

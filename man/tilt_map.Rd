@@ -11,7 +11,8 @@ tilt_map(
   x_tilt = 0,
   y_tilt = 1,
   x_shift = 0,
-  y_shift = 0
+  y_shift = 0,
+  parallel = FALSE
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ tilt_map(
 \item{x_shift}{Shift in x dimension}
 
 \item{y_shift}{Shift in y dimension}
+
+\item{parallel}{\code{logical} to run in parallel. FALSE (default)}
 }
 \value{
 sf
