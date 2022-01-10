@@ -12,6 +12,7 @@ tilt_map(
   y_tilt = 1,
   x_shift = 0,
   y_shift = 0,
+  boundary = NULL,
   parallel = FALSE
 )
 }
@@ -29,6 +30,8 @@ tilt_map(
 \item{x_shift}{Shift in x dimension}
 
 \item{y_shift}{Shift in y dimension}
+
+\item{boundary}{Another layer that is used to create a boundary that is drawn around the data}
 
 \item{parallel}{\code{logical} to run in parallel. FALSE (default)}
 }

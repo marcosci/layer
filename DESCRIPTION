@@ -1,10 +1,10 @@
 Package: layer
 Title: layer tilts your maps and turns them into ggplots
-Version: 0.0.1
+Version: 0.0.2
 Authors@R: 
     c(person("Marco", "Sciaini", email = "marco@kaldera.dev", role = c("aut", "cre")), 
       person("Cédric", "Scherer", email = "cedricphilippscherer@gmail.com", role = "aut"), 
-      person("Josh", "Erickson", role = "ctb"))
+      person("Josh", "Erickson", email = "joshualerickson@gmail.com", role = "ctb"))
 Description: layer is to simplify the whole process of creating stacked tilted maps, that are often used in scientific publications to show different environmental layers for a geographical region. Tilting maps and layering them allows to easily draw visual correlations between these environmental layers.
 License: CC0
 Encoding: UTF-8

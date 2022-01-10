@@ -9,6 +9,7 @@
 #' @param y_tilt Tilt in y dimension
 #' @param x_shift Shift in x dimension
 #' @param y_shift Shift in y dimension
+#' @param boundary Another layer that is used to create a boundary that is drawn around the data
 #' @param parallel \code{logical} to run in parallel. FALSE (default)
 #'
 #' @details
@@ -26,6 +27,7 @@ tilt_map <- function(data,
                      y_tilt = 1,
                      x_shift = 0,
                      y_shift = 0,
+                     boundary = NULL,
                      parallel = FALSE) {
   
   if (!any(class(data) %in% c("sf", "sfg"))) {
@@ -41,6 +43,7 @@ tilt_map <- function(data,
     matrix(c(cos(x), sin(x), -sin(x), cos(x)), 2, 2)
   }
 
+  if(!is.null(boundary)) data <- create_outline(boundary, data)
   
   if(parallel == TRUE){
     
@@ -75,3 +78,18 @@ tilt_map <- function(data,
   
 }
 
+create_outline <- function(outline_from, outline_to){
+  
+  if (!any(class(outline_from) %in% c("sf", "sfg"))) {
+    outline_from <- stars::st_as_stars(outline_from)
+    outline_from <- sf::st_as_sf(outline_from)
+  }
+  
+  outline_shape <- sf::st_union(outline_from) |> sf::st_cast('LINESTRING')
+  
+  rbind(
+    outline_to,
+    outline_shape
+  )
+  
+}

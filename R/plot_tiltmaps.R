@@ -22,10 +22,8 @@
 #' tilt_landscape_1 <- tilt_map(landscape_1)
 #' tilt_landscape_2 <- tilt_map(landscape_2, x_shift = 50, y_shift = 50)
 #'
-#' # put in list
-#' map_list <- list(tilt_landscape_1, tilt_landscape_2)
-#'
 #' # plot
+#' map_list <- list(tilt_landscape_1, tilt_landscape_2)
 #' plot_tiltedmaps(map_list, palette = "turbo")
 
 plot_tiltedmaps <- function(map_list, layer = NA, palette = "viridis", color = "grey50", direction = 1, begin = 0, end = 1, alpha = 1) {
@@ -43,7 +41,6 @@ plot_tiltedmaps <- function(map_list, layer = NA, palette = "viridis", color = "
   if(length(color) == 1) color <- rep(color, length(map_list))
   
   #if(!palette %in% c("viridis", "inferno", "magma", "plasma", "cividis", "mako", "rocket", "turbo", letters[1:9], scico::scico_palette_names())) stop("palette should be a palette name from the {viridis} or {scico} package.")
-  
   
   ## plot ----
   map_tilt <- ggplot() +
@@ -68,6 +65,8 @@ plot_tiltedmaps <- function(map_list, layer = NA, palette = "viridis", color = "
       if (palette[1] %in% scico::scico_palette_names()) 
         scico::scale_color_scico(palette = palette[1], direction = direction[1], begin = begin[1], end = end[1], alpha = alpha[1], guide = "none")
     }
+  
+  
   
   if(length(map_list) > 1) {
     for (i in seq_along(map_list)[-1]) {
@@ -99,7 +98,7 @@ plot_tiltedmaps <- function(map_list, layer = NA, palette = "viridis", color = "
       } else {
         map_tilt <- map_tilt +
           geom_sf(
-            data = map_list[[i]],
+            data  = map_list[[i]],
             color = color[i],
             alpha = alpha[i]
           )
@@ -109,4 +108,5 @@ plot_tiltedmaps <- function(map_list, layer = NA, palette = "viridis", color = "
   
   map_tilt +
     theme_void() 
+
 }

@@ -43,9 +43,7 @@ Takes tilted maps and plots them with ggplot.
 tilt_landscape_1 <- tilt_map(landscape_1)
 tilt_landscape_2 <- tilt_map(landscape_2, x_shift = 50, y_shift = 50)
 
-# put in list
-map_list <- list(tilt_landscape_1, tilt_landscape_2)
-
 # plot
+map_list <- list(tilt_landscape_1, tilt_landscape_2)
 plot_tiltedmaps(map_list, palette = "turbo")
 }
