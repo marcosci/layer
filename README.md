@@ -42,8 +42,8 @@ This is a basic example which shows you how to solve a common problem:
 library(layer)
 
 tilt_landscape_1 <- tilt_map(landscape_1)
-#> Lade nötiges Paket: raster
-#> Lade nötiges Paket: sp
+#> Loading required package: raster
+#> Loading required package: sp
 tilt_landscape_2 <- tilt_map(landscape_2, x_shift = 25, y_shift = 50)
 tilt_landscape_3 <- tilt_map(landscape_3, x_shift = 50, y_shift = 100)
 tilt_landscape_points <- tilt_map(landscape_points, x_shift = 75, y_shift = 150)
