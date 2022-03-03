@@ -53,7 +53,7 @@ tilt_map <- function(data,
       }
 
     data <- data %>%
-      dplyr::group_by(group = (dplyr::row_number()-1) %/% (dplyr::n()/10)) %>%
+      dplyr::group_by(group = (dplyr::row_number() - 1) %/% (dplyr::n() / 10)) %>%
       tidyr::nest() %>%
       dplyr::pull(data) %>%
       furrr::future_map(~geom_func(data = .,
