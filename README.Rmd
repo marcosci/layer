@@ -49,7 +49,7 @@ remotes::install_github("marcosci/layer")
 
 This is a basic example which shows you how to solve a common problem:
 
-```{r example, echo=TRUE, messages=FALSE}
+```{r example, fig.alt = "Basic example of a stacked tilted map"}
 library(layer)
 
 tilt_landscape_1 <- tilt_map(landscape_1)
