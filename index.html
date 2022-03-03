@@ -77,14 +77,14 @@
 
 <p>The goal of <code>layer</code> is to simplify the whole process of creating stacked tilted maps, that are often used in scientific publications to show different environmental layers for a geographical region. Tilting maps and layering them allows to easily draw visual correlations between these environmental layers.</p>
 <p>Something in the line of:</p>
-<p><img src="./reference/figures/example.jpg_large"><!-- --></p>
+<p><img src="reference/figures/example.jpg_large" title="Example of a stacked tilted map by Cédric Scherer and Marco Sciaini" alt="Example of a stacked tilted map by Cédric Scherer and Marco Sciaini"></p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <p>You can install the development version of layer from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># install.packages("devtools")</span>
-<span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"marcosci/layer"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="co"># install.packages("remotes")</span>
+<span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"marcosci/layer"</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
@@ -94,33 +94,31 @@
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/marcosci/layer" class="external-link">layer</a></span><span class="op">)</span>
 
 <span class="va">tilt_landscape_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/tilt_map.html">tilt_map</a></span><span class="op">(</span><span class="va">landscape_1</span><span class="op">)</span>
-<span class="co">#&gt; Loading required package: raster</span>
-<span class="co">#&gt; Loading required package: sp</span>
 <span class="va">tilt_landscape_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/tilt_map.html">tilt_map</a></span><span class="op">(</span><span class="va">landscape_2</span>, x_shift <span class="op">=</span> <span class="fl">25</span>, y_shift <span class="op">=</span> <span class="fl">50</span><span class="op">)</span>
 <span class="va">tilt_landscape_3</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/tilt_map.html">tilt_map</a></span><span class="op">(</span><span class="va">landscape_3</span>, x_shift <span class="op">=</span> <span class="fl">50</span>, y_shift <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>
 <span class="va">tilt_landscape_points</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/tilt_map.html">tilt_map</a></span><span class="op">(</span><span class="va">landscape_points</span>, x_shift <span class="op">=</span> <span class="fl">75</span>, y_shift <span class="op">=</span> <span class="fl">150</span><span class="op">)</span>
 
 <span class="va">map_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">tilt_landscape_1</span>, <span class="va">tilt_landscape_2</span>, <span class="va">tilt_landscape_3</span>, <span class="va">tilt_landscape_points</span><span class="op">)</span>
 
-<span class="fu"><a href="reference/plot_tiltedmaps.html">plot_tiltedmaps</a></span><span class="op">(</span><span class="va">map_list</span>, 
+<span class="fu"><a href="reference/plot_tiltedmaps.html">plot_tiltedmaps</a></span><span class="op">(</span><span class="va">map_list</span>,
                 layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"value"</span>, <span class="st">"value"</span>, <span class="st">"value"</span>, <span class="cn">NA</span><span class="op">)</span>,
                 palette <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"bilbao"</span>, <span class="st">"mako"</span>, <span class="st">"rocket"</span>, <span class="cn">NA</span><span class="op">)</span>,
                 color <span class="op">=</span> <span class="st">"grey40"</span><span class="op">)</span></code></pre></div>
-<p><img src="README-example-1.png" width="672"></p>
+<p><img src="reference/figures/README-example-1.png" title="Basic example of a stacked tilted map" alt="Basic example of a stacked tilted map" width="672"></p>
 <div class="section level3">
-<h3 id="more-advanced-examples">More advanced examples<a class="anchor" aria-label="anchor" href="#more-advanced-examples"></a>
+<h3 id="more-advanced-example">More advanced example<a class="anchor" aria-label="anchor" href="#more-advanced-example"></a>
 </h3>
 <p>Some more realistic looking data (DEM, drought, precipitation, and wildfires for continental USA):</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">tilt_landscape_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/tilt_map.html">tilt_map</a></span><span class="op">(</span><span class="va">dem_usa</span>, y_tilt <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>
 <span class="va">tilt_landscape_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/tilt_map.html">tilt_map</a></span><span class="op">(</span><span class="va">drought_usa</span>, y_tilt <span class="op">=</span> <span class="fl">3</span>, x_shift <span class="op">=</span> <span class="fl">15</span>, y_shift <span class="op">=</span> <span class="fl">25</span><span class="op">)</span>
-<span class="va">tilt_landscape_3</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/tilt_map.html">tilt_map</a></span><span class="op">(</span><span class="va">prec_usa</span>,y_tilt <span class="op">=</span> <span class="fl">3</span>,  x_shift <span class="op">=</span> <span class="fl">30</span>, y_shift <span class="op">=</span> <span class="fl">50</span><span class="op">)</span>
-<span class="va">tilt_landscape_4</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/tilt_map.html">tilt_map</a></span><span class="op">(</span><span class="va">fire_usa</span>,y_tilt <span class="op">=</span> <span class="fl">3</span>, x_shift <span class="op">=</span> <span class="fl">45</span>, y_shift <span class="op">=</span> <span class="fl">65</span><span class="op">)</span>
+<span class="va">tilt_landscape_3</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/tilt_map.html">tilt_map</a></span><span class="op">(</span><span class="va">prec_usa</span>, y_tilt <span class="op">=</span> <span class="fl">3</span>, x_shift <span class="op">=</span> <span class="fl">30</span>, y_shift <span class="op">=</span> <span class="fl">50</span><span class="op">)</span>
+<span class="va">tilt_landscape_4</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/tilt_map.html">tilt_map</a></span><span class="op">(</span><span class="va">fire_usa</span>, y_tilt <span class="op">=</span> <span class="fl">3</span>, x_shift <span class="op">=</span> <span class="fl">45</span>, y_shift <span class="op">=</span> <span class="fl">65</span><span class="op">)</span>
 
 <span class="va">map_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">tilt_landscape_1</span>, <span class="va">tilt_landscape_2</span>, <span class="va">tilt_landscape_3</span>, <span class="va">tilt_landscape_4</span><span class="op">)</span>
 
-<span class="fu"><a href="reference/plot_tiltedmaps.html">plot_tiltedmaps</a></span><span class="op">(</span><span class="va">map_list</span>, palette <span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tofino"</span>, <span class="st">"rocket"</span>, <span class="st">"mako"</span>, <span class="st">"magma"</span><span class="op">)</span>, direction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span> </code></pre></div>
-<p><img src="reference/figures/README-figure-real.png"><!-- --></p>
+<span class="fu"><a href="reference/plot_tiltedmaps.html">plot_tiltedmaps</a></span><span class="op">(</span><span class="va">map_list</span>, palette <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tofino"</span>, <span class="st">"rocket"</span>, <span class="st">"mako"</span>, <span class="st">"magma"</span><span class="op">)</span>, direction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<p><img src="reference/figures/README-adv-example.png" title="Advanced example of a stacked tilted map" alt="Advanced example of a stacked tilted map"></p>
 </div>
 </div>
 <div class="section level2">
