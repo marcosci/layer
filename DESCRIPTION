@@ -1,6 +1,6 @@
 Package: layer
 Title: layer tilts your maps and turns them into ggplots
-Version: 0.0.2
+Version: 0.0.1.9000
 Authors@R: 
     c(person("Marco", "Sciaini", email = "marco@kaldera.dev", role = c("aut", "cre")), 
       person("Cédric", "Scherer", email = "cedricphilippscherer@gmail.com", role = "aut"), 
