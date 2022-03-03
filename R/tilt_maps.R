@@ -78,7 +78,7 @@ tilt_map <- function(data,
 
 }
 
-create_outline <- function(outline_from, outline_to){
+create_outline <- function(outline_from, outline_to) {
 
   if (!any(class(outline_from) %in% c("sf", "sfg"))) {
     outline_from <- stars::st_as_stars(outline_from)
@@ -91,19 +91,19 @@ create_outline <- function(outline_from, outline_to){
   }
 
   outline_shape <- rgeos::gBuffer(sf::as_Spatial(outline_from), byid = FALSE, width = 0)
-  outline_shape <- sf::st_as_sf(sf::st_cast(sf::st_as_sf(outline_shape), 'MULTILINESTRING'))
+  outline_shape <- sf::st_as_sf(sf::st_cast(sf::st_as_sf(outline_shape), "MULTILINESTRING"))
 
-  current = attr(outline_shape, "sf_column")
-  names(outline_shape)[names(outline_shape)==current] = "geometry"
-  sf::st_geometry(outline_shape) = "geometry"
+  current <- attr(outline_shape, "sf_column")
+  names(outline_shape)[names(outline_shape) == current] <- "geometry"
+  sf::st_geometry(outline_shape) <- "geometry"
 
-  if(length(names(outline_to)) > 1) {
+  if (length(names(outline_to)) > 1) {
 
     outline_names <- names(outline_to)
     outline_names <- outline_names[-which(outline_names == "geometry")]
-    for(nm in outline_names){
-      outline_shape[paste0(nm)] <-NA
-      }
+    for (nm in outline_names) {
+      outline_shape[paste0(nm)] <- NA
+    }
   }
 
   rbind(
