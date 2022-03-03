@@ -7,6 +7,8 @@ Authors@R:
       person("Josh", "Erickson", email = "joshualerickson@gmail.com", role = "ctb"))
 Description: layer is to simplify the whole process of creating stacked tilted maps, that are often used in scientific publications to show different environmental layers for a geographical region. Tilting maps and layering them allows to easily draw visual correlations between these environmental layers.
 License: CC0
+URL: https://github.com/marcosci/layer, https://marcosci.github.io/layer
+BugReports: https://github.com/marcosci/layer/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
