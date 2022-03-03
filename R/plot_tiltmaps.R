@@ -29,16 +29,16 @@
 plot_tiltedmaps <- function(map_list, layer = NA, palette = "viridis", color = "grey50", direction = 1, begin = 0, end = 1, alpha = 1) {
 
   ## checks ----
-  if(all(is.na(layer))) layer <- "value"
-  if(length(layer) == 1) layer <- rep(layer, length(map_list))
-  if(length(alpha) == 1) alpha <- rep(alpha, length(map_list))
-  if(length(direction) == 1) direction <- rep(direction, length(map_list))
-  if(length(begin) == 1) begin <- rep(begin, length(map_list))
-  if(length(end) == 1) end <- rep(end, length(map_list))
+  if (all(is.na(layer))) layer <- "value"
+  if (length(layer) == 1) layer <- rep(layer, length(map_list))
+  if (length(alpha) == 1) alpha <- rep(alpha, length(map_list))
+  if (length(direction) == 1) direction <- rep(direction, length(map_list))
+  if (length(begin) == 1) begin <- rep(begin, length(map_list))
+  if (length(end) == 1) end <- rep(end, length(map_list))
 
   # fill in palettes and colors
-  if(length(palette) == 1) palette <- rep(palette, length(map_list))
-  if(length(color) == 1) color <- rep(color, length(map_list))
+  if (length(palette) == 1) palette <- rep(palette, length(map_list))
+  if (length(color) == 1) color <- rep(color, length(map_list))
 
   #if(!palette %in% c("viridis", "inferno", "magma", "plasma", "cividis", "mako", "rocket", "turbo", letters[1:9], scico::scico_palette_names())) stop("palette should be a palette name from the {viridis} or {scico} package.")
 
@@ -68,9 +68,9 @@ plot_tiltedmaps <- function(map_list, layer = NA, palette = "viridis", color = "
 
 
 
-  if(length(map_list) > 1) {
+  if (length(map_list) > 1) {
     for (i in seq_along(map_list)[-1]) {
-      if(!is.na(layer[[i]])){
+      if (!is.na(layer[[i]])) {
         map_tilt <- map_tilt +
           ggnewscale::new_scale_fill() +
           ggnewscale::new_scale_color()  +
