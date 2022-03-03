@@ -40,9 +40,9 @@ knitr::include_graphics("man/figures/example.jpg_large")
 
 You can install the development version of layer from [GitHub](https://github.com/) with:
 
-``` r
-# install.packages("devtools")
-devtools::install_github("marcosci/layer")
+```{r, eval = FALSE}
+# install.packages("remotes")
+remotes::install_github("marcosci/layer")
 ```
 
 ## Example
