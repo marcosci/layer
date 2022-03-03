@@ -8,7 +8,7 @@ output: github_document
 knitr::opts_chunk$set(
   collapse = TRUE,
   warning = TRUE,
-  message = TRUE,
+  message = FALSE,
   width = 120,
   comment = "#>",
   fig.retina = 2,
