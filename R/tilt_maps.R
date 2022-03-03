@@ -45,7 +45,7 @@ tilt_map <- function(data,
 
   if (!is.null(boundary)) data <- create_outline(boundary, data)
 
-  if (parallel == TRUE) {
+  if (parallel) {
 
     geom_func <- function(data, x_stretch, y_stretch, x_tilt, y_tilt, x_shift, y_shift) {
       sf::st_geometry(data) <- sf::st_geometry(data) * shear_matrix() * rotate_matrix(pi / 20) + c(x_shift, y_shift)
