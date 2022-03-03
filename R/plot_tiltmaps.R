@@ -43,58 +43,69 @@ plot_tiltedmaps <- function(map_list, layer = NA, palette = "viridis", color = "
   #if(!palette %in% c("viridis", "inferno", "magma", "plasma", "cividis", "mako", "rocket", "turbo", letters[1:9], scico::scico_palette_names())) stop("palette should be a palette name from the {viridis} or {scico} package.")
 
   ## plot ----
+  gg_scales <- mapply(
+    FUN = function(palette, direction, begin, end, alpha) {
+      if (
+        palette %in%
+          c("viridis", "inferno", "magma", "plasma", "cividis", "mako", "rocket", "turbo", letters[1:9])
+      ) {
+        gg_pal <- lapply(
+          X = sprintf("scale_%s_viridis_c", c("color", "fill")),
+          FUN = function(.f) {
+            f <- getFromNamespace(.f, "ggplot2")
+            f(
+              option = palette,
+              direction = direction,
+              begin = begin,
+              end = end,
+              alpha = alpha,
+              guide = "none"
+            )
+          }
+        )
+      } else if (palette %in% scico::scico_palette_names()) {
+        gg_pal <- lapply(
+          X = sprintf("scale_%s_scico", c("color", "fill")),
+          FUN = function(.f) {
+            f <- getFromNamespace(.f, "scico")
+            f(
+              palette = palette,
+              direction = direction,
+              begin = begin,
+              end = end,
+              alpha = alpha,
+              guide = "none"
+            )
+          }
+        )
+      } else {
+        gg_pal <- list()
+      }
+      gg_pal
+    },
+    palette, direction, begin, end, alpha
+  )
+
   map_tilt <- ggplot() +
     geom_sf(
       data = map_list[[1]],
-      aes_string(fill = layer[[1]],
-                 color = layer[[1]]), size = 0.01
+      aes_string(fill = layer[[1]], color = layer[[1]]),
+      size = 0.01
     ) +
-    {
-      if (palette[1] %in% c("viridis", "inferno", "magma", "plasma", "cividis", "mako", "rocket", "turbo", letters[1:9]))
-        scale_fill_viridis_c(option = palette[1], direction = direction[1], begin = begin[1], end = end[1], alpha = alpha[1], guide = "none")
-    } +
-    {
-      if (palette[1] %in% c("viridis", "inferno", "magma", "plasma", "cividis", "mako", "rocket", "turbo", letters[1:9]))
-        scale_color_viridis_c(option = palette[1], direction = direction[1], begin = begin[1], end = end[1], alpha = alpha[1], guide = "none")
-    } +
-    {
-      if (palette[1] %in% scico::scico_palette_names())
-        scico::scale_fill_scico(palette = palette[1], direction = direction[1], begin = begin[1], end = end[1], alpha = alpha[1], guide = "none")
-    } +
-    {
-      if (palette[1] %in% scico::scico_palette_names())
-        scico::scale_color_scico(palette = palette[1], direction = direction[1], begin = begin[1], end = end[1], alpha = alpha[1], guide = "none")
-    }
-
-
+    gg_scales[[1]]
 
   if (length(map_list) > 1) {
     for (i in seq_along(map_list)[-1]) {
       if (!is.na(layer[[i]])) {
-        map_tilt <- map_tilt +
+         map_tilt <- map_tilt +
           ggnewscale::new_scale_fill() +
-          ggnewscale::new_scale_color()  +
+          ggnewscale::new_scale_color() +
+          gg_scales[[i]] +
           geom_sf(
             data = map_list[[i]],
-            aes_string(fill = layer[[i]],
-                       color = layer[[i]]), size = .5
-          ) +
-          {
-            if (palette[i] %in% c("viridis", "inferno", "magma", "plasma", "cividis", "mako", "rocket", "turbo", letters[1:9]))
-              scale_fill_viridis_c(option = palette[i], direction = direction[i], begin = begin[i], end = end[i], alpha = alpha[i], guide = "none")
-          } +
-          {
-            if (palette[i] %in% c("viridis", "inferno", "magma", "plasma", "cividis", "mako", "rocket", "turbo", letters[1:9]))
-              scale_color_viridis_c(option = palette[i], direction = direction[i], begin = begin[i], end = end[i], alpha = alpha[i], guide = "none")
-          } +
-          {
-            if (palette[i] %in% scico::scico_palette_names())
-              scico::scale_fill_scico(palette = palette[i], direction = direction[i], begin = begin[i], end = end[i], alpha = alpha[i], guide = "none")
-          } +
-          {
-            if (palette[i] %in% scico::scico_palette_names())
-              scico::scale_color_scico(palette = palette[i], direction = direction[i], begin = begin[i], end = end[i], alpha = alpha[i], guide = "none")
-          }
+            mapping = aes_string(fill = layer[[i]], color = layer[[i]]),
+            size = .5
+          )
       } else {
         map_tilt <- map_tilt +
           geom_sf(
