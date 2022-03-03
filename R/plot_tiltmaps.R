@@ -42,6 +42,11 @@ plot_tiltedmaps <- function(map_list, layer = NA, palette = "viridis", color = "
 
   #if(!palette %in% c("viridis", "inferno", "magma", "plasma", "cividis", "mako", "rocket", "turbo", letters[1:9], scico::scico_palette_names())) stop("palette should be a palette name from the {viridis} or {scico} package.")
 
+  if (length(unique(
+    sapply(list(map_list, layer, palette, direction, begin, end, alpha, color), length)
+  )) != 1) {
+    stop("All arguments should have the same length!")
+  }
   ## plot ----
   gg_scales <- mapply(
     FUN = function(palette, direction, begin, end, alpha) {
