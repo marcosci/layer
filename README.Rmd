@@ -69,7 +69,7 @@ plot_tiltedmaps(map_list,
 
 Some more realistic looking data (DEM, drought, precipitation, and wildfires for continental USA): 
 
-```{r messages = FALSE, eval= FALSE}
+```{r adv-example, eval = !file.exists("man/figures/README-adv-example.png"), fig.alt = "Advanced example of a stacked tilted map"}
 tilt_landscape_1 <- tilt_map(dem_usa, y_tilt = 3)
 tilt_landscape_2 <- tilt_map(drought_usa, y_tilt = 3, x_shift = 15, y_shift = 25)
 tilt_landscape_3 <- tilt_map(prec_usa,y_tilt = 3,  x_shift = 30, y_shift = 50)
@@ -80,9 +80,8 @@ map_list <- list(tilt_landscape_1, tilt_landscape_2, tilt_landscape_3, tilt_land
 plot_tiltedmaps(map_list, palette =c("tofino", "rocket", "mako", "magma"), direction = c(-1, 1, 1, 1)) 
 ```
 
-
-```{r echo=FALSE}
-knitr::include_graphics(rep("man/figures/README-figure-real.png"))
+```{r, echo = FALSE, fig.alt = "Advanced example of a stacked tilted map"}
+knitr::include_graphics("man/figures/README-adv-example.png")
 ```
 
 ## Code of Conduct
