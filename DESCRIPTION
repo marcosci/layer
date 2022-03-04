@@ -1,6 +1,6 @@
 Package: layer
-Title: layer tilts your maps and turns them into ggplots
-Version: 0.0.2
+Title: Layer Tilts Your Maps And Turns Them Into ggplots
+Version: 0.0.1.9000
 Authors@R: 
     c(person("Marco", "Sciaini", email = "marco@kaldera.dev", role = c("aut", "cre")), 
       person("Cédric", "Scherer", email = "cedricphilippscherer@gmail.com", role = "aut"), 
@@ -13,7 +13,7 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
 Depends: 
-    R (>= 2.10)
+    R (>= 3.5.0)
 Imports:
     raster,
     stars,

@@ -1,0 +1,9 @@
+template:
+  bootstrap: 5
+
+development:
+  mode: auto
+
+authors:
+  Cédric Scherer:
+    href: cedricscherer.com
