@@ -12,6 +12,7 @@ tilt_map(
   y_tilt = 1,
   x_shift = 0,
   y_shift = 0,
+  angle_rotate = pi/20,
   boundary = NULL,
   parallel = FALSE
 )

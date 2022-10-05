@@ -27,6 +27,7 @@ tilt_map <- function(data,
                      y_tilt = 1,
                      x_shift = 0,
                      y_shift = 0,
+                     angle_rotate = pi/20,
                      boundary = NULL,
                      parallel = FALSE) {
   
@@ -48,7 +49,7 @@ tilt_map <- function(data,
   if(parallel == TRUE){
     
   geom_func <- function(data, x_stretch, y_stretch, x_tilt, y_tilt, x_shift, y_shift){
-    sf::st_geometry(data) <- sf::st_geometry(data) * shear_matrix() * rotate_matrix(pi / 20) + c(x_shift, y_shift) 
+    sf::st_geometry(data) <- sf::st_geometry(data) * shear_matrix() * rotate_matrix(angle_rotate) + c(x_shift, y_shift) 
     data <- data %>% sf::st_as_sf()
     }
     
@@ -68,7 +69,7 @@ tilt_map <- function(data,
   
     } else {
     
-    sf::st_geometry(data) <- sf::st_geometry(data) * shear_matrix() * rotate_matrix(pi / 20) + c(x_shift, y_shift)
+    sf::st_geometry(data) <- sf::st_geometry(data) * shear_matrix() * rotate_matrix(angle_rotate) + c(x_shift, y_shift)
   
     }
   
