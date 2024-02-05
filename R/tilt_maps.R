@@ -91,7 +91,7 @@ create_outline <- function(outline_from, outline_to){
     outline_to <- sf::st_as_sf(outline_to)
   }
   
-  outline_shape <- rgeos::gBuffer(sf::as_Spatial(outline_from), byid = FALSE, width = 0) 
+  outline_shape <- sf::st_union(sf::st_buffer(outline_from, dist = 0))
   outline_shape <- sf::st_as_sf(sf::st_cast(sf::st_as_sf(outline_shape), 'MULTILINESTRING'))
   
   current = attr(outline_shape, "sf_column")
