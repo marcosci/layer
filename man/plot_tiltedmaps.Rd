@@ -33,7 +33,7 @@ plot_tiltedmaps(
 \item{alpha}{vector of opacity for \link[viridis]{viridis} and \link[scico]{scico} color palettes}
 }
 \value{
-ggplot
+A \code{ggplot} object with stacked maps.
 }
 \description{
 Takes tilted maps and plots them with ggplot.

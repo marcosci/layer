@@ -39,7 +39,7 @@ tilt_map(
 \item{parallel}{\code{logical} to run in parallel. FALSE (default)}
 }
 \value{
-sf
+An \code{sf} object with tilted and shifted data.
 }
 \description{
 Tilt and shift maps in any direction.#'

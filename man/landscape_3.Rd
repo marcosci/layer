@@ -5,7 +5,7 @@
 \alias{landscape_3}
 \title{Landscape 3.}
 \format{
-A \code{\link[raster]{raster}} object.
+raster object
 }
 \source{
 NLMR package
@@ -15,10 +15,5 @@ landscape_3
 }
 \description{
 Distance gradient neutral landscape model.
-}
-\examples{
-if (requireNamespace("raster", quietly = TRUE)) {
-  raster::plot(landscape_3)
-}
 }
 \keyword{datasets}

@@ -15,7 +15,7 @@
 #' @details
 #' Code adopted from https://www.mzes.uni-mannheim.de/socialsciencedatalab/article/geospatial-data/.
 #'
-#' @return sf
+#' @return An `sf` object with tilted and shifted data.
 #' @importFrom magrittr "%>%"
 #' @import raster
 #' @export

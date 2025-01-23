@@ -12,7 +12,7 @@
 #' @param alpha vector of opacity for \link[viridis]{viridis} and \link[scico]{scico} color palettes
 #' 
 #'
-#' @return ggplot
+#' @return A `ggplot` object with stacked maps.
 #' @importFrom sf st_geometry_type
 #' @export
 #' @examples

@@ -5,7 +5,7 @@
 \alias{landscape_points}
 \title{Landscape Points.}
 \format{
-A \code{\link[raster]{raster}} object.
+raster object
 }
 \source{
 NLMR package
@@ -15,10 +15,5 @@ landscape_points
 }
 \description{
 Random curd neutral landscape model.
-}
-\examples{
-if (requireNamespace("raster", quietly = TRUE)) {
-  raster::plot(landscape_points)
-}
 }
 \keyword{datasets}
