@@ -25,5 +25,4 @@ Imports:
     magrittr,
     tidyr,
     furrr,
-    rgeos
 LazyData: true
