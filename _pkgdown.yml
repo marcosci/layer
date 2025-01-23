@@ -2,3 +2,16 @@ url: ~
 template:
   bootstrap: 5
 
+
+reference:
+  - title: "Key functions"
+    contents:
+      - tilt_map
+      - plot_tiltedmaps
+  - title: "Bundled data"
+    contents:
+      - landscape_1
+      - landscape_2
+      - landscape_3
+      - landscape_points
+      
