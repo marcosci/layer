@@ -5,7 +5,7 @@
 \alias{landscape_2}
 \title{Landscape 2.}
 \format{
-raster object
+A \code{\link[raster]{raster}} object.
 }
 \source{
 NLMR package
@@ -15,5 +15,10 @@ landscape_2
 }
 \description{
 Fractional Brownian motion neutral landscape model.
+}
+\examples{
+if (requireNamespace("raster", quietly = TRUE)) {
+  raster::plot(landscape_2)
+}
 }
 \keyword{datasets}
