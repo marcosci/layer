@@ -2,7 +2,7 @@ Package: layer
 Title: Tilt your Maps and Turn Them into Ggplots
 Version: 0.0.2
 Authors@R: c(
-    person("Marco", "Sciaini", , "marco@kaldera.dev", role = "aut"),
+    person("Marco", "Sciaini", , "marco@kaldera.dev", role = c("aut", "cph")),
     person("Cédric", "Scherer", , "cedricphilippscherer@gmail.com", role = "aut"),
     person("Josh", "Erickson", , "joshualerickson@gmail.com", role = "ctb"),
     person("Egor", "Kotov", , "kotov.egor@gmail.com", role = c("ctb", "cre"),
