@@ -1,28 +1,35 @@
 Package: layer
-Title: layer tilts your maps and turns them into ggplots
+Title: Tilt your Maps and Turn Them into Ggplots
 Version: 0.0.2
-Authors@R: 
-    c(person("Marco", "Sciaini", email = "marco@kaldera.dev", role = c("aut", "cre")), 
-      person("Cédric", "Scherer", email = "cedricphilippscherer@gmail.com", role = "aut"), 
-      person("Josh", "Erickson", email = "joshualerickson@gmail.com", role = "ctb"))
-Description: layer is to simplify the whole process of creating stacked tilted maps, that are often used in scientific publications to show different environmental layers for a geographical region. Tilting maps and layering them allows to easily draw visual correlations between these environmental layers.
+Authors@R: c(
+    person("Marco", "Sciaini", , "marco@kaldera.dev", role = "aut"),
+    person("Cédric", "Scherer", , "cedricphilippscherer@gmail.com", role = "aut"),
+    person("Josh", "Erickson", , "joshualerickson@gmail.com", role = "ctb"),
+    person("Egor", "Kotov", , "kotov.egor@gmail.com", role = c("ctb", "cre"),
+           comment = c(ORCID = "0000-0001-6690-5345"))
+  )
+Description: Simplifies the whole process of creating stacked tilted maps,
+    that are often used in scientific publications to show different
+    environmental layers for a geographical region. Tilting maps and
+    layering them allows to easily draw visual correlations between these
+    environmental layers.
 License: CC0
-URL: https://github.com/marcosci/layer, https://marcosci.github.io/layer
+URL: https://github.com/marcosci/layer, https://marcosci.github.io/layer/
 BugReports: https://github.com/marcosci/layer/issues
-Encoding: UTF-8
-Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
 Depends: 
     R (>= 2.10)
 Imports:
-    raster,
-    stars,
-    sf,
     dplyr,
-    scico,
-    ggplot2,
-    ggnewscale,
-    magrittr,
-    tidyr,
     furrr,
+    ggnewscale,
+    ggplot2,
+    magrittr,
+    raster,
+    scico,
+    sf,
+    stars,
+    tidyr
+Encoding: UTF-8
 LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
