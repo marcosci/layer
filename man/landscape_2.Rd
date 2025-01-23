@@ -8,7 +8,7 @@
 A \code{\link[raster]{raster}} object.
 }
 \source{
-Data generated using the \code{\link[NLMR]{NLMR}} package. See Sciaini et al. (2018) for details: \doi{10.1111/2041-210X.13076}.
+Data generated using the \href{https://ropensci.github.io/NLMR/}{NLMR} package. See Sciaini et al. (2018) for details: \doi{10.1111/2041-210X.13076}.
 }
 \usage{
 landscape_2
