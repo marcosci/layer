@@ -1,5 +1,6 @@
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+<!-- README.md is generated from README.qmd. Please edit that file -->
 
 # layer <a><img src='man/figures/logo.svg' align="right" height=210 width=182/></a>
 
@@ -9,9 +10,9 @@
 status](https://github.com/marcosci/layer/workflows/R-CMD-check/badge.svg)](https://github.com/marcosci/layer/actions?query=workflow%3AR-CMD-check)
 [![Project Status:
 Active](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/layer)](https://cran.r-project.org/web/packages/layer/)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/layer.png)](https://cran.r-project.org/web/packages/layer/)
 [![CRAN
-Downloads](https://cranlogs.r-pkg.org/badges/grand-total/layer?color=orange)](https://cran.r-project.org/package=layer)
+Downloads](https://cranlogs.r-pkg.org/badges/grand-total/layer?color=orange.png)](https://cran.r-project.org/package=layer)
 <!-- badges: end -->
 
 The goal of `layer` is to simplify the whole process of creating stacked
@@ -22,7 +23,8 @@ these environmental layers.
 
 Something in the line of:
 
-<img src="man/figures/example.jpg_large" title="Example of a stacked tilted map by Cédric Scherer and Marco Sciaini" alt="Example of a stacked tilted map by Cédric Scherer and Marco Sciaini"  />
+<img src="man/figures/example.jpg_large"
+data-fig-alt="Example of a stacked tilted map by Cédric Scherer and Marco Sciaini" />
 
 ## Installation
 
@@ -54,7 +56,8 @@ plot_tiltedmaps(map_list,
                 color = "grey40")
 ```
 
-<img src="man/figures/README-example-1.png" title="Basic example of a stacked tilted map" alt="Basic example of a stacked tilted map" width="672" />
+<img src="man/figures/README-example-1.png"
+data-fig-alt="Basic example of a stacked tilted map" width="672" />
 
 ### More advanced example
 
@@ -72,7 +75,8 @@ map_list <- list(tilt_landscape_1, tilt_landscape_2, tilt_landscape_3, tilt_land
 plot_tiltedmaps(map_list, palette = c("tofino", "rocket", "mako", "magma"), direction = c(-1, 1, 1, 1))
 ```
 
-<img src="man/figures/README-adv-example.png" title="Advanced example of a stacked tilted map" alt="Advanced example of a stacked tilted map"  />
+<img src="man/figures/README-adv-example.png"
+data-fig-alt="Advanced example of a stacked tilted map" />
 
 ## Code of Conduct
 
