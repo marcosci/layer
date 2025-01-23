@@ -3,17 +3,17 @@
 \docType{data}
 \name{landscape_points}
 \alias{landscape_points}
-\title{Landscape Points.}
+\title{Landscape Points}
 \format{
-raster object
+A \code{\link[raster]{raster}} object.
 }
 \source{
-NLMR package
+Data generated using the \code{\link[NLMR]{NLMR}} package. See Sciaini et al. (2018) for details: \doi{10.1111/2041-210X.13076}.
 }
 \usage{
 landscape_points
 }
 \description{
-Random curd neutral landscape model.
+Random curd neutral landscape model generated using the \code{NLMR} package.
 }
 \keyword{datasets}
