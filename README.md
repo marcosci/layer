@@ -10,7 +10,7 @@
 status](https://github.com/marcosci/layer/workflows/R-CMD-check/badge.svg)](https://github.com/marcosci/layer/actions?query=workflow%3AR-CMD-check)
 [![Project Status:
 Active](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/layer.png)](https://cran.r-project.org/web/packages/layer/)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/layer.png)](https://cran.r-project.org/package=layer)
 [![CRAN
 Downloads](https://cranlogs.r-pkg.org/badges/grand-total/layer?color=orange.png)](https://cran.r-project.org/package=layer)
 <!-- badges: end -->
