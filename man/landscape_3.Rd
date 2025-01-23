@@ -3,17 +3,17 @@
 \docType{data}
 \name{landscape_3}
 \alias{landscape_3}
-\title{Landscape 3.}
+\title{Landscape 3}
 \format{
-raster object
+A \code{\link[raster]{raster}} object.
 }
 \source{
-NLMR package
+Data generated using the \href{https://ropensci.github.io/NLMR/}{NLMR} package. See Sciaini et al. (2018) for details: \doi{10.1111/2041-210X.13076}.
 }
 \usage{
 landscape_3
 }
 \description{
-Distance gradient neutral landscape model.
+Distance gradient neutral landscape model generated using the \code{NLMR} package.
 }
 \keyword{datasets}

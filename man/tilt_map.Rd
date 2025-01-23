@@ -20,24 +20,26 @@ tilt_map(
 \arguments{
 \item{data}{sf or terra/stars/raster object.}
 
-\item{x_stretch}{Stretch in x dimension}
+\item{x_stretch}{Stretch in x dimension. A \code{numeric} vector of lenght 1.}
 
-\item{y_stretch}{Stretch in y dimension}
+\item{y_stretch}{Stretch in y dimension. A \code{numeric} vector of lenght 1.}
 
-\item{x_tilt}{Tilt in x dimension}
+\item{x_tilt}{Tilt in x dimension. A \code{numeric} vector of lenght 1.}
 
-\item{y_tilt}{Tilt in y dimension}
+\item{y_tilt}{Tilt in y dimension. A \code{numeric} vector of lenght 1.}
 
-\item{x_shift}{Shift in x dimension}
+\item{x_shift}{Shift in x dimension. A \code{numeric} vector of lenght 1.}
 
-\item{y_shift}{Shift in y dimension}
+\item{y_shift}{Shift in y dimension. A \code{numeric} vector of lenght 1.}
+
+\item{angle_rotate}{Rotation angle.. A \code{numeric} vector of lenght 1. Default is \code{pi/20}.}
 
 \item{boundary}{Another layer that is used to create a boundary that is drawn around the data}
 
 \item{parallel}{\code{logical} to run in parallel. FALSE (default)}
 }
 \value{
-sf
+An \code{sf} object with tilted and shifted data.
 }
 \description{
 Tilt and shift maps in any direction.#'

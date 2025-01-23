@@ -3,20 +3,21 @@
 #' Tilt and shift maps in any direction.#'
 #'
 #' @param data sf or terra/stars/raster object.
-#' @param x_stretch Stretch in x dimension
-#' @param y_stretch Stretch in y dimension
-#' @param x_tilt Tilt in x dimension
-#' @param y_tilt Tilt in y dimension
-#' @param x_shift Shift in x dimension
-#' @param y_shift Shift in y dimension
+#' @param x_stretch Stretch in x dimension. A `numeric` vector of lenght 1.
+#' @param y_stretch Stretch in y dimension. A `numeric` vector of lenght 1.
+#' @param x_tilt Tilt in x dimension. A `numeric` vector of lenght 1.
+#' @param y_tilt Tilt in y dimension. A `numeric` vector of lenght 1.
+#' @param x_shift Shift in x dimension. A `numeric` vector of lenght 1.
+#' @param y_shift Shift in y dimension. A `numeric` vector of lenght 1.
+#' @param angle_rotate Rotation angle.. A `numeric` vector of lenght 1. Default is \code{pi/20}.
 #' @param boundary Another layer that is used to create a boundary that is drawn around the data
 #' @param parallel \code{logical} to run in parallel. FALSE (default)
-#'
 #' @details
 #' Code adopted from https://www.mzes.uni-mannheim.de/socialsciencedatalab/article/geospatial-data/.
 #'
-#' @return sf
+#' @return An `sf` object with tilted and shifted data.
 #' @importFrom magrittr "%>%"
+#' @import raster
 #' @export
 #' @examples
 #' tilt_map(landscape_1)
