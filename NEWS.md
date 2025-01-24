@@ -1,3 +1,6 @@
-# layer 0.0.0.9000
+# layer 0.0.3 (2024-01-24)
 
-* Added a `NEWS.md` file to track changes to the package.
+* removed dependencies on deprecated packages
+* minor updates in documentation
+
+# layer 0.0.2
