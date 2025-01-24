@@ -16,6 +16,7 @@
 #' @importFrom sf st_geometry_type
 #' @export
 #' @examples
+#' \donttest{
 #' # tilt data
 #' tilt_landscape_1 <- tilt_map(landscape_1)
 #' tilt_landscape_2 <- tilt_map(landscape_2, x_shift = 50, y_shift = 50)
@@ -23,7 +24,8 @@
 #' # plot
 #' map_list <- list(tilt_landscape_1, tilt_landscape_2)
 #' plot_tiltedmaps(map_list, palette = "turbo")
-
+#' }
+#' 
 plot_tiltedmaps <- function(map_list, layer = NA, palette = "viridis", color = "grey50", direction = 1, begin = 0, end = 1, alpha = 1) {
   
   ## checks ----
