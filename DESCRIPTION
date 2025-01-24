@@ -1,5 +1,5 @@
 Package: layer
-Title: Tilt your Maps and Turn Them into Ggplots
+Title: Tilt your Maps and Turn Them into 'ggplot' Plots
 Version: 0.0.3
 Authors@R: c(
     person("Marco", "Sciaini", , "marco@kaldera.dev", role = c("aut", "cph")),
