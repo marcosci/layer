@@ -1,3 +1,7 @@
+## This is a resubmission
+
+* hopefully fixed the examples running > 10s with donttest
+
 ## This is a fix to return the package to CRAN
 
 - removed old dependencies (rgdal, sp, rgeos)
