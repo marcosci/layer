@@ -33,7 +33,7 @@ layers for a geographical region. Tilting maps and layering them allows to easil
 Something in the line of:
 
 ```{r, echo = FALSE, fig.alt = "Example of a stacked tilted map by Cédric Scherer and Marco Sciaini"}
-knitr::include_graphics("man/figures/example.jpg_large")
+knitr::include_graphics("man/figures/example.jpg")
 ```
 
 ## Installation

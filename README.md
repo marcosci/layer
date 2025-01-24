@@ -23,7 +23,7 @@ these environmental layers.
 
 Something in the line of:
 
-<img src="man/figures/example.jpg_large"
+<img src="man/figures/example.jpg"
 data-fig-alt="Example of a stacked tilted map by Cédric Scherer and Marco Sciaini" />
 
 ## Installation
