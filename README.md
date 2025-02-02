@@ -6,13 +6,25 @@
 
 <!-- badges: start -->
 
-[![R build
-status](https://github.com/marcosci/layer/workflows/R-CMD-check/badge.svg)](https://github.com/marcosci/layer/actions?query=workflow%3AR-CMD-check)
 [![Project Status:
 Active](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/layer.png)](https://cran.r-project.org/package=layer)
-[![CRAN
-Downloads](https://cranlogs.r-pkg.org/badges/grand-total/layer?color=orange.png)](https://cran.r-project.org/package=layer)
+<a href="https://lifecycle.r-lib.org/articles/stages.html#stable"
+target="_blank"><img
+src="https://img.shields.io/badge/lifecycle-stable-brightgreen.svg"
+alt="Lifecycle: stable" /></a>
+<a href="https://CRAN.R-project.org/package=layer" target="_blank"><img
+src="https://www.r-pkg.org/badges/version/layer"
+alt="CRAN status" /></a>
+<a href="https://CRAN.R-project.org/package=layer" target="_blank"><img
+src="https://cranlogs.r-pkg.org/badges/grand-total/layer?color=blue"
+alt="CRAN/METACRAN Total downloads" /></a>
+<a href="https://CRAN.R-project.org/package=layer" target="_blank"><img
+src="https://cranlogs.r-pkg.org/badges/layer?color=blue"
+alt="CRAN/METACRAN Downloads per month" /></a>
+[![R-CMD-check](https://github.com/marcosci/layer/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/marcosci/layer/actions/workflows/R-CMD-check.yaml)
+
+[![DOI](https://zenodo.org/badge/DOI/10.32614/CRAN.package.layer.svg)](https://doi.org/10.32614/CRAN.package.layer)
+
 <!-- badges: end -->
 
 The goal of `layer` is to simplify the whole process of creating stacked
