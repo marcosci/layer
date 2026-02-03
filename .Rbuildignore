@@ -10,3 +10,6 @@
 ^README\.qmd$
 ^CRAN-SUBMISSION$
 ^cran-comments\.md$
+^private$
+^\.Renviron$
+^\.Rprofile$
