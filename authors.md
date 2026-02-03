@@ -17,13 +17,13 @@ Source:
 [`DESCRIPTION`](https://github.com/marcosci/layer/blob/main/DESCRIPTION)
 
 Sciaini M, Scherer C (2026). *layer: Tilt your Maps and Turn Them into
-'ggplot' Plots*. R package version 0.0.3.9000,
+'ggplot' Plots*. R package version 0.0.4,
 <https://github.com/marcosci/layer>.
 
     @Manual{,
       title = {layer: Tilt your Maps and Turn Them into 'ggplot' Plots},
       author = {Marco Sciaini and Cédric Scherer},
       year = {2026},
-      note = {R package version 0.0.3.9000},
+      note = {R package version 0.0.4},
       url = {https://github.com/marcosci/layer},
     }
