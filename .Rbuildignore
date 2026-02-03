@@ -14,3 +14,5 @@
 ^\.Renviron$
 ^\.Rprofile$
 ^revdep$
+^CITATION\.cff$
+^codemeta\.json$

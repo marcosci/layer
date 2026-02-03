@@ -1,0 +1,56 @@
+{
+  "@context": "https://schema.org",
+  "type": "SoftwareSourceCode",
+  "author": [
+    {
+      "type": "Person",
+      "email": "marco@kaldera.dev",
+      "familyName": "Sciaini",
+      "givenName": "Marco"
+    },
+    {
+      "type": "Person",
+      "email": "cedricphilippscherer@gmail.com",
+      "familyName": "Scherer",
+      "givenName": "Cédric"
+    }
+  ],
+  "codeRepository": "https://github.com/marcosci/layer",
+  "contributor": [
+    {
+      "type": "Person",
+      "email": "joshualerickson@gmail.com",
+      "familyName": "Erickson",
+      "givenName": "Josh"
+    },
+    {
+      "id": "https://orcid.org/0000-0001-6690-5345",
+      "type": "Person",
+      "email": "kotov.egor@gmail.com",
+      "familyName": "Kotov",
+      "givenName": "Egor"
+    }
+  ],
+  "copyrightHolder": {
+    "type": "Person",
+    "email": "marco@kaldera.dev",
+    "familyName": "Sciaini",
+    "givenName": "Marco"
+  },
+  "description": "Simplifies the whole process of creating stacked tilted maps, that are often used in scientific publications to show different environmental layers for a geographical region. Tilting maps and layering them allows to easily draw visual correlations between these environmental layers.",
+  "license": "https://spdx.org/licenses/CC0-1.0",
+  "name": "layer: Tilt your Maps and Turn Them into 'ggplot' Plots",
+  "programmingLanguage": {
+    "type": "ComputerLanguage",
+    "name": "R",
+    "url": "https://r-project.org"
+  },
+  "provider": {
+    "id": "https://cran.r-project.org",
+    "type": "Organization",
+    "name": "Comprehensive R Archive Network (CRAN)",
+    "url": "https://cran.r-project.org"
+  },
+  "runtimePlatform": "R version 4.5.2 (2025-10-31)",
+  "version": "0.0.4"
+}
