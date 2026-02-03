@@ -13,3 +13,4 @@
 ^private$
 ^\.Renviron$
 ^\.Rprofile$
+^revdep$
