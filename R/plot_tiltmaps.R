@@ -14,6 +14,7 @@
 #'
 #' @return A `ggplot` object with stacked maps.
 #' @importFrom sf st_geometry_type
+#' @importFrom rlang .data
 #' @export
 #' @examples
 #' \donttest{
@@ -46,8 +47,8 @@ plot_tiltedmaps <- function(map_list, layer = NA, palette = "viridis", color = "
   map_tilt <- ggplot2::ggplot() +
     ggplot2::geom_sf(
       data = map_list[[1]],
-      ggplot2::aes_string(fill = layer[[1]],
-                 color = layer[[1]]), size = 0.01
+      ggplot2::aes(fill = .data[[layer[[1]]]],
+                 color = .data[[layer[[1]]]]), size = 0.01
     ) +
     {
       if (palette[1] %in% c("viridis", "inferno", "magma", "plasma", "cividis", "mako", "rocket", "turbo", letters[1:9])) 
@@ -76,8 +77,8 @@ plot_tiltedmaps <- function(map_list, layer = NA, palette = "viridis", color = "
           ggnewscale::new_scale_color()  +
           ggplot2::geom_sf(
             data = map_list[[i]],
-            ggplot2::aes_string(fill = layer[[i]],
-                       color = layer[[i]]), size = .5
+            ggplot2::aes(fill = .data[[layer[[i]]]],
+                       color = .data[[layer[[i]]]]), size = .5
           ) +
           {
             if (palette[i] %in% c("viridis", "inferno", "magma", "plasma", "cividis", "mako", "rocket", "turbo", letters[1:9])) 
