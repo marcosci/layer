@@ -1,0 +1,112 @@
+---
+title: "Animating Stacked Maps"
+vignette: >
+  %\VignetteIndexEntry{Animating Stacked Maps}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+execute:
+  eval: false
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    code-overflow: wrap
+---
+
+# Introduction
+
+One of the most visually striking uses of stacked maps is to animate movement across the layers (e.g., vehicles, wildlife, or spread of phenomena). 
+
+Since `{layer}` is built on top of `{ggplot2}`, it is fully compatible with the `{gganimate}` package. This vignette demonstrates how to create a 3D animated map stack using simulated transport data.
+
+# Setup
+
+We'll use the built-in landscapes and generate some fake "routes" and "buses" to animate.
+
+```{r}
+library(layer)
+library(sf)
+library(ggplot2)
+library(gganimate)
+
+# Load base data
+data("landscape_1")
+data("landscape_2")
+
+# Create a fake public transport route
+route_line <- st_linestring(matrix(c(10, 10, 90, 90), ncol = 2, byrow = TRUE))
+route_sf <- st_sf(route_id = "Route A", geometry = st_sfc(route_line))
+
+# Generate 20 frames of movement along the route
+n_frames <- 20
+bus_pts <- st_line_sample(route_line, n = n_frames, type = "regular") |>
+  st_cast("POINT")
+
+# Combine into a data frame with timestamps
+buses <- st_sf(
+  route_id = "Route A",
+  time = seq(
+    as.POSIXct("2021-11-11 07:00:00"),
+    as.POSIXct("2021-11-11 08:00:00"),
+    length.out = n_frames
+  ),
+  geometry = bus_pts
+)
+```
+
+# Building the Static Foundation
+
+We use the declarative `tilt_stack()` API to build the 3D environment. We'll place the transport routes on the top layer (`y_shift = 50`).
+
+```{r}
+# Define the stack
+# We use y_shift_step = 25, so Layer 1 is at 0, Layer 2 is at 25, Layer 3 is at 50
+map_stack <- tilt_stack(y_shift_step = 25) |>
+  tilt_layer(landscape_1, palette = "bilbao", label = "Terrain") |>
+  tilt_layer(landscape_2, palette = "mako", label = "Population") |>
+  tilt_layer(route_sf, color = "white", size = 1.5, label = "Transport Network")
+
+# Render the static base
+base_plot <- plot_tilt_stack(map_stack)
+```
+
+# Preparing the Animated Points
+
+To animate the buses, we need to tilt their coordinates so they perfectly align with the top layer of our stack. We can use the manual `tilt_map()` function for this.
+
+```{r}
+# Tilt the buses to match the top layer (y_shift = 50)
+buses_tilted <- tilt_map(buses, y_shift = 50)
+
+# Extract coordinates into a regular data frame for gganimate performance
+buses_df <- data.frame(
+  route_id = buses$route_id,
+  time = buses$time,
+  x = st_coordinates(buses_tilted)[, 1],
+  y = st_coordinates(buses_tilted)[, 2]
+)
+```
+
+# Assembling the Animation
+
+Finally, we append the moving points and `gganimate` instructions to our static base plot.
+
+```{r}
+animated_plot <- base_plot +
+  # Add a new color scale for the buses
+  ggnewscale::new_scale_color() +
+  geom_point(data = buses_df, aes(x = x, y = y), color = "red", size = 4) +
+
+  # gganimate specifications
+  labs(title = 'Time: {frame_time}') +
+  transition_time(time) +
+  shadow_wake(wake_length = 0.1) +
+  ease_aes('linear')
+
+# Render and save
+# anim_save("stacked_animation.gif", animated_plot)
+```
+
+# Why this works
+
+Because `plot_tilt_stack()` returns a standard `ggplot` object, we can continue to add layers and scales to it. By manually tilting the "dynamic" data using the same shift parameters as our "static" layers, we ensure everything remains perfectly aligned in the 3D perspective.

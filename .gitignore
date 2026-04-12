@@ -6,3 +6,6 @@
 private
 .Renviron
 revdep
+inst/doc
+/doc/
+/Meta/

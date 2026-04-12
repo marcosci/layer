@@ -16,3 +16,5 @@
 ^revdep$
 ^CITATION\.cff$
 ^codemeta\.json$
+^doc$
+^Meta$
