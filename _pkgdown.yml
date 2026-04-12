@@ -1,17 +1,25 @@
-url: ~
+url: https://marcosci.github.io/layer/
 template:
   bootstrap: 5
-
 
 reference:
   - title: "Key functions"
     contents:
       - tilt_map
       - plot_tiltedmaps
+  - title: "Stacking maps"
+    contents:
+      - tilt_stack
+      - tilt_layer
+      - tilt_connector
+      - tilt_lines
+  - title: "Plotting and Printing"
+    contents:
+      - plot_tilt_stack
+      - print.tilt_stack
   - title: "Bundled data"
     contents:
       - landscape_1
       - landscape_2
       - landscape_3
       - landscape_points
-      
