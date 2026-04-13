@@ -10,9 +10,14 @@ tilt_connector(
   color = "grey60",
   alpha = 1,
   size = 1,
+  linetype = "solid",
   draw_points = TRUE,
   point_color = "black",
   point_size = 1,
+  point_shape = 19,
+  point_fill = NULL,
+  point_alpha = 1,
+  point_stroke = 0.5,
   on_top = FALSE
 )
 }
@@ -27,11 +32,21 @@ tilt_connector(
 
 \item{size}{Size/thickness of the connector lines. Default is \code{1.0}.}
 
+\item{linetype}{Line type of the connector lines (e.g. "solid", "dashed").}
+
 \item{draw_points}{Logical; if \code{TRUE}, draws the points on the top layer.}
 
 \item{point_color}{Color of the points drawn on top.}
 
 \item{point_size}{Size of the points drawn on top.}
+
+\item{point_shape}{Shape of the points drawn on top.}
+
+\item{point_fill}{Fill color of the points drawn on top (for shapes 21-25).}
+
+\item{point_alpha}{Opacity of the points drawn on top.}
+
+\item{point_stroke}{Border thickness of the points drawn on top (for shapes 21-25).}
 
 \item{on_top}{Logical; if \code{TRUE}, connector lines are drawn on top of all layers. If \code{FALSE} (default), lines are interleaved between layers for perfect 3D occlusion.}
 }

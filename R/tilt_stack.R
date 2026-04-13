@@ -113,23 +113,31 @@ tilt_layer <- function(
 #' @param color Color of the connector lines.
 #' @param alpha Opacity of the connector lines.
 #' @param size Size/thickness of the connector lines. Default is `1.0`.
+#' @param linetype Line type of the connector lines (e.g. "solid", "dashed").
 #' @param draw_points Logical; if `TRUE`, draws the points on the top layer.
 #' @param point_color Color of the points drawn on top.
 #' @param point_size Size of the points drawn on top.
+#' @param point_shape Shape of the points drawn on top.
+#' @param point_fill Fill color of the points drawn on top (for shapes 21-25).
+#' @param point_alpha Opacity of the points drawn on top.
+#' @param point_stroke Border thickness of the points drawn on top (for shapes 21-25).
 #' @param on_top Logical; if `TRUE`, connector lines are drawn on top of all layers. If `FALSE` (default), lines are interleaved between layers for perfect 3D occlusion.
 #'
 #' @return The updated `tilt_stack`.
 #' @export
 tilt_connector <- function(
   stack, data,
-  color = "grey60", alpha = 1, size = 1.0,
+  color = "grey60", alpha = 1, size = 1.0, linetype = "solid",
   draw_points = TRUE, point_color = "black", point_size = 1,
+  point_shape = 19, point_fill = NULL, point_alpha = 1, point_stroke = 0.5,
   on_top = FALSE
 ) {
   conn_def <- list(
     data = data,
-    color = color, alpha = alpha, size = size,
+    color = color, alpha = alpha, size = size, linetype = linetype,
     draw_points = draw_points, point_color = point_color, point_size = point_size,
+    point_shape = point_shape, point_fill = point_fill, point_alpha = point_alpha,
+    point_stroke = point_stroke,
     on_top = on_top,
     pos = length(stack$layers) # Record position in pipeline
   )
@@ -271,10 +279,22 @@ plot_tilt_stack <- function(stack) {
           
           if (conn$on_top) {
             # Defer to end
-            connector_layers[[length(connector_layers) + 1]] <- ggplot2::geom_sf(data = lines_geom, color = conn$color, alpha = conn$alpha, size = conn$size)
+            connector_layers[[length(connector_layers) + 1]] <- ggplot2::geom_sf(
+              data = lines_geom, 
+              color = conn$color, 
+              alpha = conn$alpha, 
+              size = conn$size,
+              linetype = conn$linetype
+            )
           } else {
             # Draw now (so next map layer can occlude it)
-            p <- p + ggplot2::geom_sf(data = lines_geom, color = conn$color, alpha = conn$alpha, size = conn$size)
+            p <- p + ggplot2::geom_sf(
+              data = lines_geom, 
+              color = conn$color, 
+              alpha = conn$alpha, 
+              size = conn$size,
+              linetype = conn$linetype
+            )
           }
         }
       }
@@ -346,7 +366,15 @@ plot_tilt_stack <- function(stack) {
           pts_top <- suppressWarnings(sf::st_centroid(sf::st_geometry(pts_top)))
           pts_top <- sf::st_as_sf(pts_top)
         }
-        p <- p + ggplot2::geom_sf(data = pts_top, color = conn$point_color, size = conn$point_size)
+        p <- p + ggplot2::geom_sf(
+          data = pts_top, 
+          color = conn$point_color, 
+          size = conn$point_size,
+          shape = conn$point_shape,
+          fill = conn$point_fill,
+          alpha = conn$point_alpha,
+          stroke = conn$point_stroke
+        )
       }
     }
   }
