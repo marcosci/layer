@@ -73,6 +73,25 @@ tilt_stack(
 
 The available parameters follow `ggplot2` naming conventions: `label_family`, `label_fontface`, `label_alpha`, `label_hjust`, `label_vjust`, and `label_lineheight`.
 
+### Connector Styling
+
+Just like labels, connectors can be styled using standard `ggplot2` aesthetics. You can change the line pattern and customize the appearance of the points on the top layer:
+
+```r
+tilt_stack() |>
+  tilt_layer(landscape_1) |>
+  tilt_connector(
+    landscape_points,
+    color = "grey60",
+    linetype = "dashed",      # Dashed connector lines
+    point_shape = 21,         # Filled circle with border
+    point_fill = "red",       # Red center
+    point_color = "black",    # Black border
+    point_stroke = 1.0        # Border thickness
+  ) |>
+  tilt_layer(landscape_2)
+```
+
 ### Global vs. Local Connectors
 
 The `tilt_connector()` function is "position-aware" within your pipeline:
