@@ -14,6 +14,12 @@
 #' @param label_y Default Y coordinate for layer labels. If `NULL`, defaults to the layer's `y_shift`.
 #' @param label_color Default color for layer labels.
 #' @param label_size Default size for layer labels.
+#' @param label_family Default font family for layer labels.
+#' @param label_fontface Default font face for layer labels.
+#' @param label_alpha Default alpha for layer labels.
+#' @param label_hjust Default horizontal justification for layer labels.
+#' @param label_vjust Default vertical justification for layer labels.
+#' @param label_lineheight Default line height for layer labels.
 #' @return An object of class `tilt_stack`.
 #' @export
 #'
@@ -22,7 +28,9 @@
 tilt_stack <- function(
   x_shift_step = 0, y_shift_step = 0,
   x_stretch = 2, y_stretch = 1.2, x_tilt = 0, y_tilt = 1, angle_rotate = pi/20,
-  label_x = NULL, label_y = NULL, label_color = "grey40", label_size = 4
+  label_x = NULL, label_y = NULL, label_color = "grey40", label_size = 4,
+  label_family = "", label_fontface = "plain", label_alpha = 1,
+  label_hjust = NULL, label_vjust = 0.5, label_lineheight = 1.2
 ) {
   structure(list(
     layers = list(), 
@@ -31,7 +39,9 @@ tilt_stack <- function(
       x_shift_step = x_shift_step, y_shift_step = y_shift_step,
       x_stretch = x_stretch, y_stretch = y_stretch, 
       x_tilt = x_tilt, y_tilt = y_tilt, angle_rotate = angle_rotate,
-      label_x = label_x, label_y = label_y, label_color = label_color, label_size = label_size
+      label_x = label_x, label_y = label_y, label_color = label_color, label_size = label_size,
+      label_family = label_family, label_fontface = label_fontface, label_alpha = label_alpha,
+      label_hjust = label_hjust, label_vjust = label_vjust, label_lineheight = label_lineheight
     )
   ), class = "tilt_stack")
 }
@@ -62,6 +72,12 @@ tilt_stack <- function(
 #' @param label_y Y coordinate for the label. If `NULL`, inherits from stack defaults or `y_shift`.
 #' @param label_color Color for the label. If `NULL`, inherits from stack defaults.
 #' @param label_size Size for the label. If `NULL`, inherits from stack defaults.
+#' @param label_family Font family for the label. If `NULL`, inherits from stack defaults.
+#' @param label_fontface Font face for the label. If `NULL`, inherits from stack defaults.
+#' @param label_alpha Alpha for the label. If `NULL`, inherits from stack defaults.
+#' @param label_hjust Horizontal justification for the label. If `NULL`, inherits from stack defaults.
+#' @param label_vjust Vertical justification for the label. If `NULL`, inherits from stack defaults.
+#' @param label_lineheight Line height for the label. If `NULL`, inherits from stack defaults.
 #'
 #' @return The updated `tilt_stack`.
 #' @export
@@ -72,7 +88,9 @@ tilt_layer <- function(
   x_stretch = NULL, y_stretch = NULL, x_tilt = NULL, y_tilt = NULL, angle_rotate = NULL,
   fill = "value", color = "grey50", palette = "viridis", direction = 1, begin = 0, end = 1, alpha = 1,
   size = NULL,
-  label = NA, label_x = NULL, label_y = NULL, label_color = NULL, label_size = NULL
+  label = NA, label_x = NULL, label_y = NULL, label_color = NULL, label_size = NULL,
+  label_family = NULL, label_fontface = NULL, label_alpha = NULL,
+  label_hjust = NULL, label_vjust = NULL, label_lineheight = NULL
 ) {
   layer_def <- list(
     data = data,
@@ -81,7 +99,9 @@ tilt_layer <- function(
     x_stretch = x_stretch, y_stretch = y_stretch, x_tilt = x_tilt, y_tilt = y_tilt, angle_rotate = angle_rotate,
     fill = fill, color = color, palette = palette, direction = direction, begin = begin, end = end, alpha = alpha,
     size = size,
-    label = label, label_x = label_x, label_y = label_y, label_color = label_color, label_size = label_size
+    label = label, label_x = label_x, label_y = label_y, label_color = label_color, label_size = label_size,
+    label_family = label_family, label_fontface = label_fontface, label_alpha = label_alpha,
+    label_hjust = label_hjust, label_vjust = label_vjust, label_lineheight = label_lineheight
   )
   stack$layers[[length(stack$layers) + 1]] <- layer_def
   stack
@@ -266,10 +286,39 @@ plot_tilt_stack <- function(stack) {
       lbl_y <- if (!is.null(layer_def$label_y)) layer_def$label_y else p_curr$y_shift
       lbl_col <- if (!is.null(layer_def$label_color)) layer_def$label_color else stack$defaults$label_color
       lbl_size <- if (!is.null(layer_def$label_size)) layer_def$label_size else stack$defaults$label_size
-      lbl_hjust <- if (is.null(layer_def$label_x) && is.null(stack$defaults$label_x)) 1 else 0
+      
+      # Typography overrides
+      lbl_fam <- if (!is.null(layer_def$label_family)) layer_def$label_family else stack$defaults$label_family
+      lbl_face <- if (!is.null(layer_def$label_fontface)) layer_def$label_fontface else stack$defaults$label_fontface
+      lbl_alpha <- if (!is.null(layer_def$label_alpha)) layer_def$label_alpha else stack$defaults$label_alpha
+      lbl_vjust <- if (!is.null(layer_def$label_vjust)) layer_def$label_vjust else stack$defaults$label_vjust
+      lbl_lh <- if (!is.null(layer_def$label_lineheight)) layer_def$label_lineheight else stack$defaults$label_lineheight
+      
+      # Smart hjust
+      lbl_hjust <- if (!is.null(layer_def$label_hjust)) {
+        layer_def$label_hjust 
+      } else if (!is.null(stack$defaults$label_hjust)) {
+        stack$defaults$label_hjust
+      } else if (is.null(layer_def$label_x) && is.null(stack$defaults$label_x)) {
+        1 # Auto-align to left of stack
+      } else {
+        0 # Default left-aligned
+      }
 
       if (!is.null(lbl_x) && !is.null(lbl_y)) {
-        p <- p + ggplot2::annotate("text", label = layer_def$label, x = lbl_x, y = lbl_y, color = lbl_col, size = lbl_size, hjust = lbl_hjust)
+        p <- p + ggplot2::annotate(
+          "text", 
+          label = layer_def$label, 
+          x = lbl_x, y = lbl_y, 
+          color = lbl_col, 
+          size = lbl_size, 
+          hjust = lbl_hjust,
+          vjust = lbl_vjust,
+          family = lbl_fam,
+          fontface = lbl_face,
+          alpha = lbl_alpha,
+          lineheight = lbl_lh
+        )
         has_labels <- TRUE
       }
     }

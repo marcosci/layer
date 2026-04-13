@@ -15,7 +15,13 @@ tilt_stack(
   label_x = NULL,
   label_y = NULL,
   label_color = "grey40",
-  label_size = 4
+  label_size = 4,
+  label_family = "",
+  label_fontface = "plain",
+  label_alpha = 1,
+  label_hjust = NULL,
+  label_vjust = 0.5,
+  label_lineheight = 1.2
 )
 }
 \arguments{
@@ -40,6 +46,18 @@ tilt_stack(
 \item{label_color}{Default color for layer labels.}
 
 \item{label_size}{Default size for layer labels.}
+
+\item{label_family}{Default font family for layer labels.}
+
+\item{label_fontface}{Default font face for layer labels.}
+
+\item{label_alpha}{Default alpha for layer labels.}
+
+\item{label_hjust}{Default horizontal justification for layer labels.}
+
+\item{label_vjust}{Default vertical justification for layer labels.}
+
+\item{label_lineheight}{Default line height for layer labels.}
 }
 \value{
 An object of class \code{tilt_stack}.

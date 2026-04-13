@@ -28,7 +28,13 @@ tilt_layer(
   label_x = NULL,
   label_y = NULL,
   label_color = NULL,
-  label_size = NULL
+  label_size = NULL,
+  label_family = NULL,
+  label_fontface = NULL,
+  label_alpha = NULL,
+  label_hjust = NULL,
+  label_vjust = NULL,
+  label_lineheight = NULL
 )
 }
 \arguments{
@@ -79,6 +85,18 @@ tilt_layer(
 \item{label_color}{Color for the label. If \code{NULL}, inherits from stack defaults.}
 
 \item{label_size}{Size for the label. If \code{NULL}, inherits from stack defaults.}
+
+\item{label_family}{Font family for the label. If \code{NULL}, inherits from stack defaults.}
+
+\item{label_fontface}{Font face for the label. If \code{NULL}, inherits from stack defaults.}
+
+\item{label_alpha}{Alpha for the label. If \code{NULL}, inherits from stack defaults.}
+
+\item{label_hjust}{Horizontal justification for the label. If \code{NULL}, inherits from stack defaults.}
+
+\item{label_vjust}{Vertical justification for the label. If \code{NULL}, inherits from stack defaults.}
+
+\item{label_lineheight}{Line height for the label. If \code{NULL}, inherits from stack defaults.}
 }
 \value{
 The updated \code{tilt_stack}.

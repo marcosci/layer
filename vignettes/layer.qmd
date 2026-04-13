@@ -56,6 +56,23 @@ a
 - **`tilt_layer()`**: Adds a raster or vector layer. It inherits global spatial parameters unless overridden. The `label` argument automatically places text next to the layer in 3D space.
 - **`tilt_connector()`**: Takes a set of points and automatically calculates their positions on every layer in the stack, drawing vertical connecting lines that respect the 3D occlusion. By default, lines are interleaved between layers (`on_top = FALSE`), but can be forced to the front with `on_top = TRUE`.
 
+### Typography Control
+
+The package provides full control over the appearance of layer labels. You can set global defaults in `tilt_stack()` or override them for specific layers in `tilt_layer()`:
+
+```r
+tilt_stack(
+  label_family = "serif", 
+  label_fontface = "bold",
+  label_color = "black",
+  label_alpha = 0.8
+) |>
+  tilt_layer(landscape_1, label = "Layer 1") |>
+  tilt_layer(landscape_2, label = "Layer 2", label_color = "red") # Override
+```
+
+The available parameters follow `ggplot2` naming conventions: `label_family`, `label_fontface`, `label_alpha`, `label_hjust`, `label_vjust`, and `label_lineheight`.
+
 ### Global vs. Local Connectors
 
 The `tilt_connector()` function is "position-aware" within your pipeline:
