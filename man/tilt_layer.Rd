@@ -9,6 +9,8 @@ tilt_layer(
   data,
   x_shift = NULL,
   y_shift = NULL,
+  x_shift_rel = NULL,
+  y_shift_rel = NULL,
   x_stretch = NULL,
   y_stretch = NULL,
   x_tilt = NULL,
@@ -34,9 +36,13 @@ tilt_layer(
 
 \item{data}{An \code{sf} or raster object.}
 
-\item{x_shift}{Shift in x dimension. If \code{NULL}, inherits from stack defaults.}
+\item{x_shift}{Absolute shift in x dimension. If \code{NULL} and \code{x_shift_rel} is \code{NULL}, inherits from stack defaults.}
 
-\item{y_shift}{Shift in y dimension. If \code{NULL}, inherits from stack defaults.}
+\item{y_shift}{Absolute shift in y dimension. If \code{NULL} and \code{y_shift_rel} is \code{NULL}, inherits from stack defaults.}
+
+\item{x_shift_rel}{Relative shift in x dimension from the previous layer's position.}
+
+\item{y_shift_rel}{Relative shift in y dimension from the previous layer's position.}
 
 \item{x_stretch}{Stretch in x dimension. If \code{NULL}, inherits from stack defaults.}
 

@@ -9,10 +9,11 @@ tilt_connector(
   data,
   color = "grey60",
   alpha = 1,
-  size = 0.5,
+  size = 1,
   draw_points = TRUE,
   point_color = "black",
-  point_size = 1
+  point_size = 1,
+  on_top = FALSE
 )
 }
 \arguments{
@@ -24,13 +25,15 @@ tilt_connector(
 
 \item{alpha}{Opacity of the connector lines.}
 
-\item{size}{Size/thickness of the connector lines.}
+\item{size}{Size/thickness of the connector lines. Default is \code{1.0}.}
 
 \item{draw_points}{Logical; if \code{TRUE}, draws the points on the top layer.}
 
 \item{point_color}{Color of the points drawn on top.}
 
 \item{point_size}{Size of the points drawn on top.}
+
+\item{on_top}{Logical; if \code{TRUE}, connector lines are drawn on top of all layers. If \code{FALSE} (default), lines are interleaved between layers for perfect 3D occlusion.}
 }
 \value{
 The updated \code{tilt_stack}.

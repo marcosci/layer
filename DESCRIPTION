@@ -24,6 +24,7 @@ Imports:
     ggnewscale,
     ggplot2,
     magrittr,
+    memoise,
     raster,
     rlang,
     scico,
