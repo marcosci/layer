@@ -9,7 +9,7 @@ tilt_connector(
   data,
   color = "grey60",
   alpha = 1,
-  size = 1,
+  linewidth = 1,
   linetype = "solid",
   draw_points = TRUE,
   point_color = "black",
@@ -30,7 +30,7 @@ tilt_connector(
 
 \item{alpha}{Opacity of the connector lines.}
 
-\item{size}{Size/thickness of the connector lines. Default is \code{1.0}.}
+\item{linewidth}{Thickness of the connector lines. Default is \code{1.0}.}
 
 \item{linetype}{Line type of the connector lines (e.g. "solid", "dashed").}
 

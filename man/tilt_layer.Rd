@@ -27,6 +27,7 @@ tilt_layer(
   label = NA,
   label_x = NULL,
   label_y = NULL,
+  label_align = NULL,
   label_color = NULL,
   label_size = NULL,
   label_family = NULL,
@@ -74,13 +75,15 @@ tilt_layer(
 
 \item{alpha}{Opacity of the layer.}
 
-\item{size}{Size of the points or lines in the layer. If \code{NULL}, defaults to \code{0.01} for the first layer and \code{0.5} for others.}
+\item{size}{Size/linewidth of the points or lines in the layer. If \code{NULL}, defaults to \code{0.01} for the first layer and \code{0.5} for others.}
 
 \item{label}{Optional text label to annotate the layer.}
 
 \item{label_x}{X coordinate for the label. If \code{NULL}, inherits from stack defaults.}
 
 \item{label_y}{Y coordinate for the label. If \code{NULL}, inherits from stack defaults or \code{y_shift}.}
+
+\item{label_align}{Alignment for the label: \code{"stack"} or \code{"layer"}. If \code{NULL}, inherits from stack defaults.}
 
 \item{label_color}{Color for the label. If \code{NULL}, inherits from stack defaults.}
 

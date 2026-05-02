@@ -1,6 +1,3 @@
-#' @importFrom memoise memoise
-.tilt_map_mem <- memoise::memoise(tilt_map)
-
 #' Initialize a tilt stack
 #'
 #' @param x_shift_step Default shift in x dimension per layer.
@@ -12,6 +9,7 @@
 #' @param angle_rotate Default rotation angle.
 #' @param label_x Default X coordinate for layer labels.
 #' @param label_y Default Y coordinate for layer labels. If `NULL`, defaults to the layer's `y_shift`.
+#' @param label_align Default alignment for labels: `"stack"` (default) aligns all labels to the leftmost edge of the entire stack; `"layer"` aligns each label to the leftmost edge of its specific layer.
 #' @param label_color Default color for layer labels.
 #' @param label_size Default size for layer labels.
 #' @param label_family Default font family for layer labels.
@@ -28,7 +26,8 @@
 tilt_stack <- function(
   x_shift_step = 0, y_shift_step = 0,
   x_stretch = 2, y_stretch = 1.2, x_tilt = 0, y_tilt = 1, angle_rotate = pi/20,
-  label_x = NULL, label_y = NULL, label_color = "grey40", label_size = 4,
+  label_x = NULL, label_y = NULL, label_align = "stack",
+  label_color = "grey40", label_size = 4,
   label_family = "", label_fontface = "plain", label_alpha = 1,
   label_hjust = NULL, label_vjust = 0.5, label_lineheight = 1.2
 ) {
@@ -39,7 +38,8 @@ tilt_stack <- function(
       x_shift_step = x_shift_step, y_shift_step = y_shift_step,
       x_stretch = x_stretch, y_stretch = y_stretch, 
       x_tilt = x_tilt, y_tilt = y_tilt, angle_rotate = angle_rotate,
-      label_x = label_x, label_y = label_y, label_color = label_color, label_size = label_size,
+      label_x = label_x, label_y = label_y, label_align = label_align,
+      label_color = label_color, label_size = label_size,
       label_family = label_family, label_fontface = label_fontface, label_alpha = label_alpha,
       label_hjust = label_hjust, label_vjust = label_vjust, label_lineheight = label_lineheight
     )
@@ -66,10 +66,11 @@ tilt_stack <- function(
 #' @param begin Start of interval for palette.
 #' @param end End of interval for palette.
 #' @param alpha Opacity of the layer.
-#' @param size Size of the points or lines in the layer. If `NULL`, defaults to `0.01` for the first layer and `0.5` for others.
+#' @param size Size/linewidth of the points or lines in the layer. If `NULL`, defaults to `0.01` for the first layer and `0.5` for others.
 #' @param label Optional text label to annotate the layer.
 #' @param label_x X coordinate for the label. If `NULL`, inherits from stack defaults.
 #' @param label_y Y coordinate for the label. If `NULL`, inherits from stack defaults or `y_shift`.
+#' @param label_align Alignment for the label: `"stack"` or `"layer"`. If `NULL`, inherits from stack defaults.
 #' @param label_color Color for the label. If `NULL`, inherits from stack defaults.
 #' @param label_size Size for the label. If `NULL`, inherits from stack defaults.
 #' @param label_family Font family for the label. If `NULL`, inherits from stack defaults.
@@ -88,7 +89,8 @@ tilt_layer <- function(
   x_stretch = NULL, y_stretch = NULL, x_tilt = NULL, y_tilt = NULL, angle_rotate = NULL,
   fill = "value", color = "grey50", palette = "viridis", direction = 1, begin = 0, end = 1, alpha = 1,
   size = NULL,
-  label = NA, label_x = NULL, label_y = NULL, label_color = NULL, label_size = NULL,
+  label = NA, label_x = NULL, label_y = NULL, label_align = NULL,
+  label_color = NULL, label_size = NULL,
   label_family = NULL, label_fontface = NULL, label_alpha = NULL,
   label_hjust = NULL, label_vjust = NULL, label_lineheight = NULL
 ) {
@@ -99,7 +101,8 @@ tilt_layer <- function(
     x_stretch = x_stretch, y_stretch = y_stretch, x_tilt = x_tilt, y_tilt = y_tilt, angle_rotate = angle_rotate,
     fill = fill, color = color, palette = palette, direction = direction, begin = begin, end = end, alpha = alpha,
     size = size,
-    label = label, label_x = label_x, label_y = label_y, label_color = label_color, label_size = label_size,
+    label = label, label_x = label_x, label_y = label_y, label_align = label_align,
+    label_color = label_color, label_size = label_size,
     label_family = label_family, label_fontface = label_fontface, label_alpha = label_alpha,
     label_hjust = label_hjust, label_vjust = label_vjust, label_lineheight = label_lineheight
   )
@@ -112,7 +115,7 @@ tilt_layer <- function(
 #' @param data An `sf` object representing the points/polygons to connect.
 #' @param color Color of the connector lines.
 #' @param alpha Opacity of the connector lines.
-#' @param size Size/thickness of the connector lines. Default is `1.0`.
+#' @param linewidth Thickness of the connector lines. Default is `1.0`.
 #' @param linetype Line type of the connector lines (e.g. "solid", "dashed").
 #' @param draw_points Logical; if `TRUE`, draws the points on the top layer.
 #' @param point_color Color of the points drawn on top.
@@ -127,14 +130,20 @@ tilt_layer <- function(
 #' @export
 tilt_connector <- function(
   stack, data,
-  color = "grey60", alpha = 1, size = 1.0, linetype = "solid",
+  color = "grey60", alpha = 1, linewidth = 1.0, linetype = "solid",
   draw_points = TRUE, point_color = "black", point_size = 1,
   point_shape = 19, point_fill = NULL, point_alpha = 1, point_stroke = 0.5,
   on_top = FALSE
 ) {
+  # Pre-calculate centroids to speed up tilt_map operations later
+  geom_types <- as.character(sf::st_geometry_type(data))
+  if (any(geom_types != "POINT")) {
+    data <- suppressWarnings(sf::st_centroid(data))
+  }
+
   conn_def <- list(
     data = data,
-    color = color, alpha = alpha, size = size, linetype = linetype,
+    color = color, alpha = alpha, linewidth = linewidth, linetype = linetype,
     draw_points = draw_points, point_color = point_color, point_size = point_size,
     point_shape = point_shape, point_fill = point_fill, point_alpha = point_alpha,
     point_stroke = point_stroke,
@@ -204,20 +213,26 @@ plot_tilt_stack <- function(stack) {
   # 1. Resolve all spatial parameters once for the whole stack
   params <- .resolve_params(stack)
 
-  # 2. Pre-calculate global xmin for label positioning (use bbox corners for speed)
-  global_xmin <- NULL
-  if (is.null(stack$defaults$label_x)) {
-    xmins <- sapply(seq_along(stack$layers), function(i) {
-      l <- stack$layers[[i]]
+  # 2. Pre-evaluation Phase: Tilt all layers and connectors ONCE
+  tilted_layers <- lapply(seq_along(stack$layers), function(i) {
+    l <- stack$layers[[i]]
+    p <- params[[i]]
+    tilt_map(l$data, x_stretch = p$x_stretch, y_stretch = p$y_stretch, x_tilt = p$x_tilt, y_tilt = p$y_tilt, x_shift = p$x_shift, y_shift = p$y_shift, angle_rotate = p$angle_rotate)
+  })
+
+  tilted_connectors <- lapply(seq_along(stack$connectors), function(j) {
+    conn <- stack$connectors[[j]]
+    lapply(seq_along(stack$layers), function(i) {
       p <- params[[i]]
-      bb <- sf::st_bbox(l$data)
-      corners <- matrix(c(bb[1], bb[2], bb[3], bb[2], bb[3], bb[4], bb[1], bb[4]), ncol = 2, byrow = TRUE)
-      sm <- matrix(c(p$x_stretch, p$y_stretch, p$x_tilt, p$y_tilt), 2, 2)
-      rm <- matrix(c(cos(p$angle_rotate), sin(p$angle_rotate), -sin(p$angle_rotate), cos(p$angle_rotate)), 2, 2)
-      t_corners <- corners %*% sm %*% rm + rep(c(p$x_shift, p$y_shift), each = 4)
-      min(t_corners[, 1])
+      tilt_map(conn$data, x_stretch = p$x_stretch, y_stretch = p$y_stretch, x_tilt = p$x_tilt, y_tilt = p$y_tilt, x_shift = p$x_shift, y_shift = p$y_shift, angle_rotate = p$angle_rotate)
     })
-    global_xmin <- min(xmins)
+  })
+
+  # 3. Robust xmin for label positioning
+  global_xmin <- if (is.null(stack$defaults$label_x)) {
+    min(sapply(tilted_layers, function(x) sf::st_bbox(x)["xmin"]))
+  } else {
+    stack$defaults$label_x
   }
 
   p <- ggplot2::ggplot()
@@ -225,13 +240,11 @@ plot_tilt_stack <- function(stack) {
   has_labels <- FALSE
   connector_layers <- list()
 
-  # 3. Main Rendering Loop
+  # 4. Main Rendering Loop
   for (i in seq_along(stack$layers)) {
     layer_def <- stack$layers[[i]]
     p_curr <- params[[i]]
-    
-    # Use memoised tilt function
-    tilted_data <- .tilt_map_mem(layer_def$data, x_stretch = p_curr$x_stretch, y_stretch = p_curr$y_stretch, x_tilt = p_curr$x_tilt, y_tilt = p_curr$y_tilt, x_shift = p_curr$x_shift, y_shift = p_curr$y_shift, angle_rotate = p_curr$angle_rotate)
+    tilted_data <- tilted_layers[[i]]
 
     # Fallback if fill column is missing or non-numeric
     if (!is.na(layer_def$fill)) {
@@ -241,12 +254,18 @@ plot_tilt_stack <- function(stack) {
     }
 
     # Draw Map Layer
+    geom_type <- as.character(sf::st_geometry_type(tilted_data))[1]
     if (!is.na(layer_def$fill)) {
       if (has_mapped_fill) {
         p <- p + ggnewscale::new_scale_fill() + ggnewscale::new_scale_color()
       }
       layer_size <- if (!is.null(layer_def$size)) layer_def$size else (if (i == 1) 0.01 else 0.5)
-      p <- p + ggplot2::geom_sf(data = tilted_data, ggplot2::aes(fill = .data[[layer_def$fill]], color = .data[[layer_def$fill]]), size = layer_size, alpha = layer_def$alpha)
+      
+      if (geom_type == "POINT") {
+        p <- p + ggplot2::geom_sf(data = tilted_data, ggplot2::aes(fill = .data[[layer_def$fill]], color = .data[[layer_def$fill]]), size = layer_size, alpha = layer_def$alpha)
+      } else {
+        p <- p + ggplot2::geom_sf(data = tilted_data, ggplot2::aes(fill = .data[[layer_def$fill]], color = .data[[layer_def$fill]]), linewidth = layer_size, alpha = layer_def$alpha)
+      }
       has_mapped_fill <- TRUE
 
       # Apply scales
@@ -259,21 +278,23 @@ plot_tilt_stack <- function(stack) {
       }
     } else {
       layer_size <- if (!is.null(layer_def$size)) layer_def$size else (if (i == 1) 0.01 else 0.5)
-      p <- p + ggplot2::geom_sf(data = tilted_data, color = layer_def$color, alpha = layer_def$alpha, size = layer_size)
+      if (geom_type == "POINT") {
+        p <- p + ggplot2::geom_sf(data = tilted_data, color = layer_def$color, alpha = layer_def$alpha, size = layer_size)
+      } else {
+        p <- p + ggplot2::geom_sf(data = tilted_data, color = layer_def$color, alpha = layer_def$alpha, linewidth = layer_size)
+      }
     }
 
-    # 4. Collect Connectors
+    # 5. Collect Connectors
     if (i < length(stack$layers) && length(stack$connectors) > 0) {
-      p_next <- params[[i + 1]]
       for (j in seq_along(stack$connectors)) {
         conn <- stack$connectors[[j]]
         is_global <- conn$pos == 0 || conn$pos == length(stack$layers)
         is_local_to_this_gap <- conn$pos == i
         
         if (is_global || is_local_to_this_gap) {
-          # Use memoised tilt function for connectors too
-          pts_curr <- .tilt_map_mem(conn$data, x_stretch = p_curr$x_stretch, y_stretch = p_curr$y_stretch, x_tilt = p_curr$x_tilt, y_tilt = p_curr$y_tilt, x_shift = p_curr$x_shift, y_shift = p_curr$y_shift, angle_rotate = p_curr$angle_rotate)
-          pts_next <- .tilt_map_mem(conn$data, x_stretch = p_next$x_stretch, y_stretch = p_next$y_stretch, x_tilt = p_next$x_tilt, y_tilt = p_next$y_tilt, x_shift = p_next$x_shift, y_shift = p_next$y_shift, angle_rotate = p_next$angle_rotate)
+          pts_curr <- tilted_connectors[[j]][[i]]
+          pts_next <- tilted_connectors[[j]][[i + 1]]
           
           lines_geom <- tilt_lines(pts_curr, pts_next)
           
@@ -283,7 +304,7 @@ plot_tilt_stack <- function(stack) {
               data = lines_geom, 
               color = conn$color, 
               alpha = conn$alpha, 
-              size = conn$size,
+              linewidth = conn$linewidth,
               linetype = conn$linetype
             )
           } else {
@@ -292,7 +313,7 @@ plot_tilt_stack <- function(stack) {
               data = lines_geom, 
               color = conn$color, 
               alpha = conn$alpha, 
-              size = conn$size,
+              linewidth = conn$linewidth,
               linetype = conn$linetype
             )
           }
@@ -300,9 +321,18 @@ plot_tilt_stack <- function(stack) {
       }
     }
 
-    # 5. Annotations
+    # 6. Annotations
     if (!is.na(layer_def$label)) {
-      lbl_x <- if (!is.null(layer_def$label_x)) layer_def$label_x else if (!is.null(stack$defaults$label_x)) stack$defaults$label_x else global_xmin - 5
+      align_mode <- if (!is.null(layer_def$label_align)) layer_def$label_align else stack$defaults$label_align
+      
+      lbl_x <- if (!is.null(layer_def$label_x)) {
+        layer_def$label_x 
+      } else if (align_mode == "layer") {
+        sf::st_bbox(tilted_data)["xmin"] - 5
+      } else { # "stack"
+        global_xmin - 5
+      }
+      
       lbl_y <- if (!is.null(layer_def$label_y)) layer_def$label_y else p_curr$y_shift
       lbl_col <- if (!is.null(layer_def$label_color)) layer_def$label_color else stack$defaults$label_color
       lbl_size <- if (!is.null(layer_def$label_size)) layer_def$label_size else stack$defaults$label_size
@@ -344,12 +374,12 @@ plot_tilt_stack <- function(stack) {
     }
   }
 
-  # 6. Draw all connector lines on top
+  # 7. Draw all connector lines on top
   for (cl in connector_layers) {
     p <- p + cl
   }
 
-  # 7. Draw Top Points
+  # 8. Draw Top Points
   if (length(stack$connectors) > 0) {
     p_top <- params[[length(params)]]
     for (j in seq_along(stack$connectors)) {
@@ -358,14 +388,8 @@ plot_tilt_stack <- function(stack) {
       is_top_layer_connector <- conn$pos == (length(stack$layers) - 1)
       
       if (conn$draw_points && (is_global || is_top_layer_connector)) {
-        # Use memoised tilt function
-        pts_top <- .tilt_map_mem(conn$data, x_stretch = p_top$x_stretch, y_stretch = p_top$y_stretch, x_tilt = p_top$x_tilt, y_tilt = p_top$y_tilt, x_shift = p_top$x_shift, y_shift = p_top$y_shift, angle_rotate = p_top$angle_rotate)
+        pts_top <- tilted_connectors[[j]][[length(tilted_connectors[[j]])]]
         
-        geom_types <- as.character(sf::st_geometry_type(pts_top))
-        if (any(geom_types != "POINT")) {
-          pts_top <- suppressWarnings(sf::st_centroid(sf::st_geometry(pts_top)))
-          pts_top <- sf::st_as_sf(pts_top)
-        }
         p <- p + ggplot2::geom_sf(
           data = pts_top, 
           color = conn$point_color, 
