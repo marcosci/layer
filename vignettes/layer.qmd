@@ -167,9 +167,13 @@ my_plot <- tilt_stack(y_shift_step = 50) |>
 
 ### Performance & Re-rendering
 
-One of the key advantages of the new API is that **spatial transformations are only calculated once** when you call `plot_tilt_stack()`. The resulting object is a standard `ggplot` object containing the already-tilted geometry.
+The new API uses **lazy evaluation**. Spatial transformations are not calculated when you define a layer with `tilt_layer()`, but rather performed once when you call `plot_tilt_stack()` (or when the stack is printed).
 
-This means you can save your stack and then instantly tweak the styling (themes, labels, titles) without waiting for the 3D math to run again:
+The resulting object is a standard `ggplot` object containing the already-tilted geometry. This allows you to tweak the styling (themes, labels, titles) without waiting for the 3D math to run again. Note that while this avoids the computational overhead of the 3D projection, the actual rendering time in `ggplot2` still depends on the complexity of your data.
+
+::: {.callout-important}
+Note that the `tilt_stack` object itself does not cache individual layers. If you add a 3rd layer to a 2-layer stack and plot it again, all three layers will be re-calculated from scratch.
+:::
 
 ```{r}
 # This re-renders instantly because the 3D tilting is already "frozen" in my_plot

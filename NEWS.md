@@ -1,5 +1,11 @@
 # layer (development version)
 
+## New features
+
+* A completely new declarative API (`tilt_stack()`, `tilt_layer()`, `tilt_connector()`). Spatial transformations are lazily evaluated and performed once when the stack is rendered. The resulting `ggplot2` object contains the pre-tilted geometries, allowing styling changes (themes, labels) to be applied without re-calculating the 3D projection on every update. Note that the actual rendering time in `ggplot2` remains proportional to the data complexity.
+
+* `plot_tiltedmaps()` is now deprecated in favor of the new `tilt_stack()` API.
+
 # layer 0.0.4 (2026-02-03)
 
 * removed deprecated ggplot2 code
