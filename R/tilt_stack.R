@@ -390,15 +390,18 @@ plot_tilt_stack <- function(stack) {
       if (conn$draw_points && (is_global || is_top_layer_connector)) {
         pts_top <- tilted_connectors[[j]][[length(tilted_connectors[[j]])]]
         
-        p <- p + ggplot2::geom_sf(
+        # Build geom_sf call dynamically to avoid "Ignoring empty aesthetic: fill" warnings
+        point_args <- list(
           data = pts_top, 
           color = conn$point_color, 
           size = conn$point_size,
           shape = conn$point_shape,
-          fill = conn$point_fill,
           alpha = conn$point_alpha,
           stroke = conn$point_stroke
         )
+        if (!is.null(conn$point_fill)) point_args$fill <- conn$point_fill
+        
+        p <- p + do.call(ggplot2::geom_sf, point_args)
       }
     }
   }
