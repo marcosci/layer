@@ -14,6 +14,10 @@
 #' @keywords internal
 "_PACKAGE"
 
+#' @importFrom mirai daemons
+#' @export
+mirai::daemons
+
 ## usethis namespace: start
 #' @importFrom lifecycle deprecated
 ## usethis namespace: end

@@ -31,3 +31,20 @@ A \code{gganim} object.
 \description{
 Creates a \code{gganimate} object that visualizes the "infolding" or "revealing" of a map stack.
 }
+\examples{
+\donttest{
+# CRAN-compliant parallel example
+if (requireNamespace("mirai", quietly = TRUE)) {
+  mirai::daemons(1, dispatcher = FALSE)
+  
+  stack <- tilt_stack() |>
+    tilt_layer(landscape_1) |>
+    tilt_layer(landscape_2)
+    
+  anim <- animate_tilt_stack(stack, n_frames = 5)
+  
+  mirai::daemons(0)
+  Sys.sleep(1)
+}
+}
+}
