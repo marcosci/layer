@@ -16,7 +16,6 @@
 #' Code adopted from https://www.mzes.uni-mannheim.de/socialsciencedatalab/article/geospatial-data/.
 #'
 #' @return An `sf` object with tilted and shifted data.
-#' @importFrom magrittr "%>%"
 #' @import raster
 #' @export
 #' @examples
@@ -51,21 +50,21 @@ tilt_map <- function(data,
     
   geom_func <- function(data, x_stretch, y_stretch, x_tilt, y_tilt, x_shift, y_shift){
     sf::st_geometry(data) <- sf::st_geometry(data) * shear_matrix() * rotate_matrix(angle_rotate) + c(x_shift, y_shift) 
-    data <- data %>% sf::st_as_sf()
+    data |> sf::st_as_sf()
     }
     
-  data <- data %>%
-    dplyr::group_by(group = (dplyr::row_number()-1) %/% (dplyr::n()/10))%>%
-    tidyr::nest() %>% 
-    dplyr::pull(data) %>%
+  data <- data |>
+    dplyr::group_by(group = (dplyr::row_number()-1) %/% (dplyr::n()/10)) |>
+    tidyr::nest() |> 
+    dplyr::pull(data) |>
     furrr::future_map(~geom_func(data = .,
                                           x_stretch = x_stretch,
                                           y_stretch = y_stretch,
                                           x_tilt = x_tilt,
                                           y_tilt = y_tilt,
                                           x_shift = x_shift,
-                                          y_shift = y_shift)) %>% 
-    dplyr::bind_rows() %>% 
+                                          y_shift = y_shift)) |> 
+    dplyr::bind_rows() |> 
     sf::st_as_sf()
   
     } else {
