@@ -70,16 +70,23 @@ tilt_match <- function(data, stack, layer = 1) {
 #' \donttest{
 #' # CRAN-compliant parallel example
 #' if (requireNamespace("mirai", quietly = TRUE)) {
-#'   mirai::daemons(1, dispatcher = FALSE)
+#'   # Try to set up a daemon, but handle cases where it might be blocked
+#'   # (e.g., by some system security profiles)
+#'   daemons_started <- tryCatch({
+#'     mirai::daemons(1, dispatcher = FALSE)
+#'     TRUE
+#'   }, error = function(e) FALSE)
 #'   
-#'   stack <- tilt_stack() |>
-#'     tilt_layer(landscape_1) |>
-#'     tilt_layer(landscape_2)
+#'   if (daemons_started) {
+#'     stack <- tilt_stack() |>
+#'       tilt_layer(landscape_1) |>
+#'       tilt_layer(landscape_2)
+#'       
+#'     anim <- animate_tilt_stack(stack, n_frames = 5)
 #'     
-#'   anim <- animate_tilt_stack(stack, n_frames = 5)
-#'   
-#'   mirai::daemons(0)
-#'   Sys.sleep(1)
+#'     mirai::daemons(0)
+#'     Sys.sleep(1)
+#'   }
 #' }
 #' }
 animate_tilt_stack <- function(stack, type = c("unfold", "reveal"), direction = c("up", "down"), n_frames = 50, ...) {
@@ -102,10 +109,10 @@ animate_tilt_stack <- function(stack, type = c("unfold", "reveal"), direction = 
   status <- .get_mirai_status()
   
   if (status$active) {
-    # Ensure workers have necessary packages
+    # Ensure workers have necessary packages loaded
     mirai::everywhere({
-      library(layer)
-      library(sf)
+      loadNamespace("layer")
+      loadNamespace("sf")
     })
   }
 
@@ -129,10 +136,10 @@ animate_tilt_stack <- function(stack, type = c("unfold", "reveal"), direction = 
     # Broadcast data once
     mirai::everywhere(
       {
-        .L_DATA <<- .d
-        .L_PARAMS <<- .p
-        .L_NFRAMES <<- .nf
-        .L_FPL <<- .fpl
+        do.call("assign", list(".L_DATA", .d, envir = .GlobalEnv))
+        do.call("assign", list(".L_PARAMS", .p, envir = .GlobalEnv))
+        do.call("assign", list(".L_NFRAMES", .nf, envir = .GlobalEnv))
+        do.call("assign", list(".L_FPL", .fpl, envir = .GlobalEnv))
       },
       .args = list(.d = layer_data_list, .p = params_final, .nf = n_frames, .fpl = frames_per_layer)
     )
@@ -162,7 +169,9 @@ animate_tilt_stack <- function(stack, type = c("unfold", "reveal"), direction = 
     )
     
     tilted_finals <- results[mirai::.progress]
-    mirai::everywhere(rm(.L_DATA, .L_PARAMS, .L_NFRAMES, .L_FPL))
+    mirai::everywhere({
+      rm(list = c(".L_DATA", ".L_PARAMS", ".L_NFRAMES", ".L_FPL"), envir = .GlobalEnv)
+    })
   } else {
     # Serial path (Existing logic)
     cli::cli_inform(c("i" = "Animation: Using Tier 3 (Serial Execution)"))
@@ -244,10 +253,10 @@ animate_tilt_stack <- function(stack, type = c("unfold", "reveal"), direction = 
     # Broadcast data once
     mirai::everywhere(
       {
-        .L_DATA <<- .d
-        .L_PARAMS <<- .p
-        .L_ANCHOR <<- .pa
-        .L_NFRAMES <<- .nf
+        do.call("assign", list(".L_DATA", .d, envir = .GlobalEnv))
+        do.call("assign", list(".L_PARAMS", .p, envir = .GlobalEnv))
+        do.call("assign", list(".L_ANCHOR", .pa, envir = .GlobalEnv))
+        do.call("assign", list(".L_NFRAMES", .nf, envir = .GlobalEnv))
       },
       .args = list(.d = layer_data_list, .p = params_final, .pa = p_anchor, .nf = n_frames)
     )
@@ -288,7 +297,9 @@ animate_tilt_stack <- function(stack, type = c("unfold", "reveal"), direction = 
     )
     
     tilted_finals <- results[mirai::.progress]
-    mirai::everywhere(rm(.L_DATA, .L_PARAMS, .L_ANCHOR, .L_NFRAMES))
+    mirai::everywhere({
+      rm(list = c(".L_DATA", ".L_PARAMS", ".L_ANCHOR", ".L_NFRAMES"), envir = .GlobalEnv)
+    })
 
     if (any(sapply(tilted_finals, mirai::is_error_value))) {
       err_idx <- which(sapply(tilted_finals, mirai::is_error_value))[1]

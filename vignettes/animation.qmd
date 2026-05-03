@@ -46,7 +46,9 @@ stack <- tilt_stack(y_shift_step = 50) |>
 # Create an "accordion" unfold animation
 # mirai::daemons(0)
 # mirai::daemons(4)
+# tictoc::tic()
 anim <- animate_tilt_stack(stack, type = "unfold", n_frames = 10)
+# tictoc::toc()
 
 # Render the animation
 # gganimate::anim_save("unfold_animation.gif", anim, fps = 25)

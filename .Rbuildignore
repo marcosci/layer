@@ -18,3 +18,4 @@
 ^codemeta\.json$
 ^doc$
 ^Meta$
+^conductor$

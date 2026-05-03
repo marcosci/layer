@@ -35,16 +35,23 @@ Creates a \code{gganimate} object that visualizes the "infolding" or "revealing"
 \donttest{
 # CRAN-compliant parallel example
 if (requireNamespace("mirai", quietly = TRUE)) {
-  mirai::daemons(1, dispatcher = FALSE)
+  # Try to set up a daemon, but handle cases where it might be blocked
+  # (e.g., by some system security profiles)
+  daemons_started <- tryCatch({
+    mirai::daemons(1, dispatcher = FALSE)
+    TRUE
+  }, error = function(e) FALSE)
   
-  stack <- tilt_stack() |>
-    tilt_layer(landscape_1) |>
-    tilt_layer(landscape_2)
+  if (daemons_started) {
+    stack <- tilt_stack() |>
+      tilt_layer(landscape_1) |>
+      tilt_layer(landscape_2)
+      
+    anim <- animate_tilt_stack(stack, n_frames = 5)
     
-  anim <- animate_tilt_stack(stack, n_frames = 5)
-  
-  mirai::daemons(0)
-  Sys.sleep(1)
+    mirai::daemons(0)
+    Sys.sleep(1)
+  }
 }
 }
 }
