@@ -9,3 +9,4 @@ revdep
 inst/doc
 /doc/
 /Meta/
+.Rprofile
