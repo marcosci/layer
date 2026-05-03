@@ -7,12 +7,15 @@ reference:
     contents:
       - tilt_map
       - plot_tiltedmaps
+      - animate_tilt_stack
   - title: "Stacking maps"
     contents:
       - tilt_stack
       - tilt_layer
       - tilt_connector
       - tilt_lines
+      - tilt_match
+      - resolve_stack_params
   - title: "Plotting and Printing"
     contents:
       - plot_tilt_stack
@@ -23,3 +26,6 @@ reference:
       - landscape_2
       - landscape_3
       - landscape_points
+  - title: "Package Overview"
+    contents:
+      - layer-package

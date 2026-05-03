@@ -94,9 +94,9 @@ create_outline <- function(outline_from, outline_to){
   outline_shape <- sf::st_union(sf::st_buffer(outline_from, dist = 0))
   outline_shape <- sf::st_as_sf(sf::st_cast(sf::st_as_sf(outline_shape), 'MULTILINESTRING'))
   
-  current = attr(outline_shape, "sf_column")
-  names(outline_shape)[names(outline_shape)==current] = "geometry"
-  sf::st_geometry(outline_shape) = "geometry"
+  current <- attr(outline_shape, "sf_column")
+  names(outline_shape)[names(outline_shape) == current] <- "geometry"
+  sf::st_geometry(outline_shape) <- "geometry"
   
   if(length(names(outline_to)) > 1) {
     
