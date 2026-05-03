@@ -19,6 +19,7 @@ BugReports: https://github.com/marcosci/layer/issues
 Depends: 
     R (>= 2.10)
 Imports:
+    cli,
     dplyr,
     furrr,
     ggnewscale,
@@ -38,6 +39,8 @@ RoxygenNote: 7.3.3
 Suggests: 
     gganimate,
     knitr,
+    mirai,
+    mori,
     quarto,
     rmarkdown
 VignetteBuilder: quarto

@@ -6,7 +6,15 @@
 \alias{layer-package}
 \title{layer: Tilt your Maps and Turn Them into 'ggplot' Plots}
 \description{
-Simplifies the whole process of creating stacked tilted maps, that are often used in scientific publications to show different environmental layers for a geographical region. Tilting maps and layering them allows to easily draw visual correlations between these environmental layers.
+Simplifies the process of creating stacked tilted maps, commonly used in
+scientific publications to visualize spatial correlations across different
+environmental layers.
+}
+\details{
+The package provides a declarative API (\code{tilt_stack()}) to easily build
+map stacks, handle spatial transformations, and automatically generate
+connecting lines between layers. It also includes high-level animation
+support via \code{animate_tilt_stack()}.
 }
 \seealso{
 Useful links:

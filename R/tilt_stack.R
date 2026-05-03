@@ -154,8 +154,15 @@ tilt_connector <- function(
   stack
 }
 
-#' @noRd
-.resolve_params <- function(stack) {
+#' Resolve spatial parameters for a tilt stack
+#'
+#' This function calculates the absolute spatial transformation parameters (shift, tilt, stretch, rotation)
+#' for each layer in a `tilt_stack` object, resolving relative shifts and applying global defaults.
+#'
+#' @param stack A `tilt_stack` object.
+#' @return A list of resolved parameters for each layer.
+#' @export
+resolve_stack_params <- function(stack) {
   resolved <- list()
   curr_x <- 0
   curr_y <- 0
@@ -211,7 +218,7 @@ plot_tilt_stack <- function(stack) {
   if (length(stack$layers) == 0) return(ggplot2::ggplot() + ggplot2::theme_void())
 
   # 1. Resolve all spatial parameters once for the whole stack
-  params <- .resolve_params(stack)
+  params <- resolve_stack_params(stack)
 
   # 2. Pre-evaluation Phase: Tilt all layers and connectors ONCE
   tilted_layers <- lapply(seq_along(stack$layers), function(i) {

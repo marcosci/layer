@@ -15,13 +15,50 @@ format:
 
 # Introduction
 
-One of the most visually striking uses of stacked maps is to animate movement across the layers (e.g., vehicles, wildlife, or spread of phenomena). 
+One of the most visually striking uses of stacked maps is to animate the "infolding" or "revealing" of the layers. `{layer}` provides a high-level API to create these animations with a single function call, while remaining fully compatible with `{gganimate}` for more advanced scenarios.
 
-Since `{layer}` is built on top of `{ggplot2}`, it is fully compatible with the `{gganimate}` package. This vignette demonstrates how to create a 3D animated map stack using simulated transport data.
+# Quick Start: High-Level Animation
 
-# Setup
+The easiest way to animate a stack is using `animate_tilt_stack()`. It takes a `tilt_stack` object and generates a `gganimate` object.
 
-We'll use the built-in landscapes and generate some fake "routes" and "buses" to animate.
+There are two primary animation types:
+
+1.  **`"unfold"` (Default):** All layers transition from a flat 2D state to their final 3D positions simultaneously.
+2.  **`"reveal"`:** Layers appear and transition into place one by one.
+
+```{r}
+library(layer)
+library(sf)
+library(ggplot2)
+library(gganimate)
+
+# Load base data
+data("landscape_1")
+data("landscape_2")
+data("landscape_3")
+
+# Define a standard stack
+stack <- tilt_stack(y_shift_step = 50) |>
+  tilt_layer(landscape_1, palette = "bilbao", label = "Bottom") |>
+  tilt_layer(landscape_2, palette = "mako", label = "Middle") |>
+  tilt_layer(landscape_3, palette = "rocket", label = "Top")
+
+# Create an "accordion" unfold animation
+# mirai::daemons(0)
+# mirai::daemons(4)
+anim <- animate_tilt_stack(stack, type = "unfold", n_frames = 10)
+
+# Render the animation
+# gganimate::anim_save("unfold_animation.gif", anim, fps = 25)
+```
+
+# Advanced: Custom Movement & Matching Data
+
+While `animate_tilt_stack()` handles the most common use cases, you can also build custom animations by manually tilting your data. This is particularly useful when you have moving objects (like vehicles or wildlife) that need to stay "pinned" to a specific layer.
+
+## Setup for Custom Animation
+
+We'll generate some fake "routes" and "buses" to animate.
 
 ```{r}
 library(layer)
@@ -72,11 +109,11 @@ base_plot <- plot_tilt_stack(map_stack)
 
 # Preparing the Animated Points
 
-To animate the buses, we need to tilt their coordinates so they perfectly align with the top layer of our stack. We can use the manual `tilt_map()` function for this.
+To animate the buses, we need to tilt their coordinates so they perfectly align with the top layer of our stack. We can now use the `tilt_match()` utility which automatically handles the spatial transformations based on our stack definition.
 
 ```{r}
-# Tilt the buses to match the top layer (y_shift = 50)
-buses_tilted <- tilt_map(buses, y_shift = 50)
+# Tilt the buses to match the 3rd layer of our stack
+buses_tilted <- tilt_match(buses, map_stack, layer = 3)
 
 # Extract coordinates into a regular data frame for gganimate performance
 buses_df <- data.frame(
