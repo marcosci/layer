@@ -42,6 +42,14 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
+      - name: Install macOS system dependencies
+        if: runner.os == 'macOS'
+        run: brew install gdal proj
+
+      - name: PROJ data path (macOS)
+        if: runner.os == 'macOS'
+        run: echo "PROJ_DATA=$(brew --prefix)/share/proj" >> $GITHUB_ENV
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::rcmdcheck
