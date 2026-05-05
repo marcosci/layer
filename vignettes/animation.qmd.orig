@@ -13,7 +13,14 @@ format:
     code-overflow: wrap
 ---
 
-
+```{r setup, include=FALSE}
+# Ensure animations and progress bars stay out of the rendered documentation
+options(gganimate.verbose = FALSE)
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE
+)
+```
 
 # Introduction
 
@@ -28,8 +35,7 @@ There are two primary animation types:
 1.  **`"unfold"` (Default):** All layers transition from a flat 2D state to their final 3D positions simultaneously.
 2.  **`"reveal"`:** Layers appear and transition into place one by one.
 
-
-``` r
+```{r}
 library(layer)
 library(sf)
 library(ggplot2)
@@ -49,13 +55,13 @@ stack <- tilt_stack(y_shift_step = 50, label_side = "left") |>
 # Create a snappier, smoother "reveal" animation
 # We use more frames for smoothness but higher FPS for speed
 # sequential = FALSE makes all layers reveal simultaneously
+# library(mirai) ; mirai::daemons(4) # use this to generate on 4 CPU cores or more, adjust to you liking, animate_tilt_stack will automatically detect the daemons you set here
 anim <- animate_tilt_stack(stack, type = "reveal", n_frames = 45, sequential = FALSE)
+# mirai::daemons(0) remember to shutdown the daemons when you are done
 
 # Render the animation at 50 FPS for high-speed fluid motion
 animate(anim, fps = 50, renderer = gifski_renderer(), verbose = FALSE)
 ```
-
-<img src="figures/unnamed-chunk-1-1.gif" alt="" style="display: block; margin: auto;" />
 
 # Advanced: Custom Movement & Matching Data
 
@@ -65,8 +71,11 @@ While `animate_tilt_stack()` handles the most common use cases, you can also bui
 
 We'll generate a synthetic transport network with 3 different routes and multiple vehicles.
 
+::: {.callout-note}
+Inspired by Rafael Pereira's [Animating public transport networks on 3D stacked maps](https://www.urbandemographics.org/post/animating-transport-networks-3d-maps/).
+:::
 
-``` r
+```{r}
 library(layer)
 library(sf)
 library(ggplot2)
@@ -96,8 +105,7 @@ vehicles <- do.call(rbind, lapply(names(routes_list), function(id) {
 
 We use the declarative `tilt_stack()` API to build the 3D environment. We'll place the transport routes on the top layer (`y_shift = 50`) using a gray dotted line.
 
-
-``` r
+```{r}
 # Define the stack with right-side labels (Step = 25 -> L1:0, L2:25, L3:50)
 map_stack <- tilt_stack(y_shift_step = 25, label_side = "right") |>
   tilt_layer(landscape_1, palette = "bilbao", label = "Terrain") |>
@@ -111,14 +119,11 @@ base_plot$layers[[length(base_plot$layers)]]$aes_params$linewidth <- 0.8
 base_plot
 ```
 
-<img src="figures/unnamed-chunk-3-1.png" alt="" width="504" style="display: block; margin: auto;" />
-
 # Preparing the Animated Points
 
 To animate the vehicles, we tilt their coordinates to match the 3rd layer of our stack.
 
-
-``` r
+```{r}
 # Tilt vehicles to match Layer 3
 vehicles_tilted <- tilt_match(vehicles, map_stack, layer = 3)
 
@@ -135,8 +140,9 @@ vehicles_df <- data.frame(
 
 Finally, we append the moving points and `gganimate` instructions.
 
-
-``` r
+```{r}
+#| message: false
+#| warning: false
 animated_plot <- base_plot +
   ggnewscale::new_scale_color() +
   geom_point(data = vehicles_df, aes(x = x, y = y, color = route_id), size = 4) +
@@ -148,8 +154,6 @@ animated_plot <- base_plot +
 # Render at 50 FPS
 animate(animated_plot, nframes = 50, fps = 50, renderer = gifski_renderer(), verbose = FALSE)
 ```
-
-<img src="figures/unnamed-chunk-5-1.gif" alt="" style="display: block; margin: auto;" />
 
 # Why this works
 

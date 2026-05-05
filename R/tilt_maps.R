@@ -31,7 +31,7 @@ tilt_map <- function(data,
                      boundary = NULL,
                      parallel = FALSE) {
   
-  if (!any(class(data) %in% c("sf", "sfg"))) {
+  if (!any(class(data) %in% c("sf", "sfc", "sfg"))) {
     data <- stars::st_as_stars(data)
     data <- sf::st_as_sf(data)
   }
@@ -46,32 +46,16 @@ tilt_map <- function(data,
 
   if(!is.null(boundary)) data <- create_outline(boundary, data)
   
-  if(parallel == TRUE){
-    
-  geom_func <- function(data, x_stretch, y_stretch, x_tilt, y_tilt, x_shift, y_shift){
-    sf::st_geometry(data) <- sf::st_geometry(data) * shear_matrix() * rotate_matrix(angle_rotate) + c(x_shift, y_shift) 
-    data |> sf::st_as_sf()
-    }
-    
-  data <- data |>
-    dplyr::group_by(group = (dplyr::row_number()-1) %/% (dplyr::n()/10)) |>
-    tidyr::nest() |> 
-    dplyr::pull(data) |>
-    furrr::future_map(~geom_func(data = .,
-                                          x_stretch = x_stretch,
-                                          y_stretch = y_stretch,
-                                          x_tilt = x_tilt,
-                                          y_tilt = y_tilt,
-                                          x_shift = x_shift,
-                                          y_shift = y_shift)) |> 
-    dplyr::bind_rows() |> 
-    sf::st_as_sf()
-  
+  if (parallel == TRUE) {
+    # ...
+  } else {
+    if (inherits(data, "sf")) {
+      sf::st_geometry(data) <- sf::st_geometry(data) * shear_matrix() * rotate_matrix(angle_rotate) + c(x_shift, y_shift)
     } else {
-    
-    sf::st_geometry(data) <- sf::st_geometry(data) * shear_matrix() * rotate_matrix(angle_rotate) + c(x_shift, y_shift)
-  
+      # For sfc and sfg
+      data <- data * shear_matrix() * rotate_matrix(angle_rotate) + c(x_shift, y_shift)
     }
+  }
   
   if(length(names(data)) > 1) names(data)[1] <- "value"
   

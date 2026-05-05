@@ -9,6 +9,8 @@ animate_tilt_stack(
   type = c("unfold", "reveal"),
   direction = c("up", "down"),
   n_frames = 50,
+  sequential = TRUE,
+  verbose = interactive(),
   ...
 )
 }
@@ -16,12 +18,16 @@ animate_tilt_stack(
 \item{stack}{A \code{tilt_stack} object.}
 
 \item{type}{The type of animation: \code{"unfold"} (all layers expand from flat to 3D simultaneously)
-or \code{"reveal"} (layers appear one by one).}
+or \code{"reveal"} (layers appear with a zoom effect).}
 
 \item{direction}{The direction of the animation: \code{"up"} (bottom layer is fixed) or \code{"down"} (top layer is fixed).
 Currently only affects \code{"unfold"}.}
 
 \item{n_frames}{Number of frames for the animation.}
+
+\item{sequential}{Logical. If \code{TRUE} (default), the animation progresses layer by layer. If \code{FALSE}, all layers are animated simultaneously.}
+
+\item{verbose}{Logical. If \code{TRUE}, shows progress messages. Defaults to \code{interactive()}.}
 
 \item{...}{Additional arguments passed to \code{gganimate} functions.}
 }
@@ -47,7 +53,7 @@ if (requireNamespace("mirai", quietly = TRUE)) {
       tilt_layer(landscape_1) |>
       tilt_layer(landscape_2)
       
-    anim <- animate_tilt_stack(stack, n_frames = 5)
+    anim <- animate_tilt_stack(stack, n_frames = 5, verbose = FALSE)
     
     mirai::daemons(0)
     Sys.sleep(1)

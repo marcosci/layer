@@ -14,7 +14,10 @@ tilt_stack(
   angle_rotate = pi/20,
   label_x = NULL,
   label_y = NULL,
+  label_side = c("left", "right"),
   label_align = "stack",
+  label_x_offset = NULL,
+  label_y_offset = NULL,
   label_color = "grey40",
   label_size = 4,
   label_family = "",
@@ -42,9 +45,15 @@ tilt_stack(
 
 \item{label_x}{Default X coordinate for layer labels.}
 
-\item{label_y}{Default Y coordinate for layer labels. If \code{NULL}, defaults to the layer's \code{y_shift}.}
+\item{label_y}{Default Y coordinate for layer labels. If \code{NULL}, defaults to the visual vertical center of the layer edge.}
 
-\item{label_align}{Default alignment for labels: \code{"stack"} (default) aligns all labels to the leftmost edge of the entire stack; \code{"layer"} aligns each label to the leftmost edge of its specific layer.}
+\item{label_side}{Default side for layer labels: \code{"left"} (default) or \code{"right"}.}
+
+\item{label_align}{Default alignment for labels: \code{"stack"} (default) aligns all labels to the edge of the entire stack; \code{"layer"} aligns each label to the edge of its specific layer.}
+
+\item{label_x_offset}{Default horizontal offset for layer labels.}
+
+\item{label_y_offset}{Default vertical offset for layer labels.}
 
 \item{label_color}{Default color for layer labels.}
 

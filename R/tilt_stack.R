@@ -8,8 +8,11 @@
 #' @param y_tilt Default tilt in y dimension.
 #' @param angle_rotate Default rotation angle.
 #' @param label_x Default X coordinate for layer labels.
-#' @param label_y Default Y coordinate for layer labels. If `NULL`, defaults to the layer's `y_shift`.
-#' @param label_align Default alignment for labels: `"stack"` (default) aligns all labels to the leftmost edge of the entire stack; `"layer"` aligns each label to the leftmost edge of its specific layer.
+#' @param label_y Default Y coordinate for layer labels. If `NULL`, defaults to the visual vertical center of the layer edge.
+#' @param label_side Default side for layer labels: `"left"` (default) or `"right"`.
+#' @param label_align Default alignment for labels: `"stack"` (default) aligns all labels to the edge of the entire stack; `"layer"` aligns each label to the edge of its specific layer.
+#' @param label_x_offset Default horizontal offset for layer labels.
+#' @param label_y_offset Default vertical offset for layer labels.
 #' @param label_color Default color for layer labels.
 #' @param label_size Default size for layer labels.
 #' @param label_family Default font family for layer labels.
@@ -26,11 +29,13 @@
 tilt_stack <- function(
   x_shift_step = 0, y_shift_step = 0,
   x_stretch = 2, y_stretch = 1.2, x_tilt = 0, y_tilt = 1, angle_rotate = pi/20,
-  label_x = NULL, label_y = NULL, label_align = "stack",
+  label_x = NULL, label_y = NULL, label_side = c("left", "right"), label_align = "stack",
+  label_x_offset = NULL, label_y_offset = NULL,
   label_color = "grey40", label_size = 4,
   label_family = "", label_fontface = "plain", label_alpha = 1,
   label_hjust = NULL, label_vjust = 0.5, label_lineheight = 1.2
 ) {
+  label_side <- match.arg(label_side)
   structure(list(
     layers = list(), 
     connectors = list(),
@@ -38,7 +43,8 @@ tilt_stack <- function(
       x_shift_step = x_shift_step, y_shift_step = y_shift_step,
       x_stretch = x_stretch, y_stretch = y_stretch, 
       x_tilt = x_tilt, y_tilt = y_tilt, angle_rotate = angle_rotate,
-      label_x = label_x, label_y = label_y, label_align = label_align,
+      label_x = label_x, label_y = label_y, label_side = label_side, label_align = label_align,
+      label_x_offset = label_x_offset, label_y_offset = label_y_offset,
       label_color = label_color, label_size = label_size,
       label_family = label_family, label_fontface = label_fontface, label_alpha = label_alpha,
       label_hjust = label_hjust, label_vjust = label_vjust, label_lineheight = label_lineheight
@@ -69,8 +75,11 @@ tilt_stack <- function(
 #' @param size Size/linewidth of the points or lines in the layer. If `NULL`, defaults to `0.01` for the first layer and `0.5` for others.
 #' @param label Optional text label to annotate the layer.
 #' @param label_x X coordinate for the label. If `NULL`, inherits from stack defaults.
-#' @param label_y Y coordinate for the label. If `NULL`, inherits from stack defaults or `y_shift`.
+#' @param label_y Y coordinate for the label. If `NULL`, inherits from stack defaults or the layer's visual center.
+#' @param label_side Side for the label: `"left"` or `"right"`. If `NULL`, inherits from stack defaults.
 #' @param label_align Alignment for the label: `"stack"` or `"layer"`. If `NULL`, inherits from stack defaults.
+#' @param label_x_offset Horizontal offset for the label. If `NULL`, inherits from stack defaults.
+#' @param label_y_offset Vertical offset for the label. If `NULL`, inherits from stack defaults.
 #' @param label_color Color for the label. If `NULL`, inherits from stack defaults.
 #' @param label_size Size for the label. If `NULL`, inherits from stack defaults.
 #' @param label_family Font family for the label. If `NULL`, inherits from stack defaults.
@@ -89,7 +98,8 @@ tilt_layer <- function(
   x_stretch = NULL, y_stretch = NULL, x_tilt = NULL, y_tilt = NULL, angle_rotate = NULL,
   fill = "value", color = "grey50", palette = "viridis", direction = 1, begin = 0, end = 1, alpha = 1,
   size = NULL,
-  label = NA, label_x = NULL, label_y = NULL, label_align = NULL,
+  label = NA, label_x = NULL, label_y = NULL, label_side = NULL, label_align = NULL,
+  label_x_offset = NULL, label_y_offset = NULL,
   label_color = NULL, label_size = NULL,
   label_family = NULL, label_fontface = NULL, label_alpha = NULL,
   label_hjust = NULL, label_vjust = NULL, label_lineheight = NULL
@@ -101,7 +111,8 @@ tilt_layer <- function(
     x_stretch = x_stretch, y_stretch = y_stretch, x_tilt = x_tilt, y_tilt = y_tilt, angle_rotate = angle_rotate,
     fill = fill, color = color, palette = palette, direction = direction, begin = begin, end = end, alpha = alpha,
     size = size,
-    label = label, label_x = label_x, label_y = label_y, label_align = label_align,
+    label = label, label_x = label_x, label_y = label_y, label_side = label_side, label_align = label_align,
+    label_x_offset = label_x_offset, label_y_offset = label_y_offset,
     label_color = label_color, label_size = label_size,
     label_family = label_family, label_fontface = label_fontface, label_alpha = label_alpha,
     label_hjust = label_hjust, label_vjust = label_vjust, label_lineheight = label_lineheight
@@ -235,9 +246,14 @@ plot_tilt_stack <- function(stack) {
     })
   })
 
-  # 3. Robust xmin for label positioning
+  # 3. Robust xmin/xmax for label positioning
   global_xmin <- if (is.null(stack$defaults$label_x)) {
     min(sapply(tilted_layers, function(x) sf::st_bbox(x)["xmin"]))
+  } else {
+    stack$defaults$label_x
+  }
+  global_xmax <- if (is.null(stack$defaults$label_x)) {
+    max(sapply(tilted_layers, function(x) sf::st_bbox(x)["xmax"]))
   } else {
     stack$defaults$label_x
   }
@@ -331,16 +347,38 @@ plot_tilt_stack <- function(stack) {
     # 6. Annotations
     if (!is.na(layer_def$label)) {
       align_mode <- if (!is.null(layer_def$label_align)) layer_def$label_align else stack$defaults$label_align
+      side <- if (!is.null(layer_def$label_side)) layer_def$label_side else stack$defaults$label_side
       
+      # Precise anchor logic: find extreme points of actual tilted geometry
+      coords <- sf::st_coordinates(tilted_data)
+      if (side == "right") {
+        anchor_idx <- which.max(coords[, "X"])
+      } else {
+        anchor_idx <- which.min(coords[, "X"])
+      }
+      anchor_x <- coords[anchor_idx, "X"]
+      anchor_y <- coords[anchor_idx, "Y"]
+      
+      x_off <- if (!is.null(layer_def$label_x_offset)) layer_def$label_x_offset else (if (!is.null(stack$defaults$label_x_offset)) stack$defaults$label_x_offset else 5)
+      y_off <- if (!is.null(layer_def$label_y_offset)) layer_def$label_y_offset else (if (!is.null(stack$defaults$label_y_offset)) stack$defaults$label_y_offset else 0)
+
       lbl_x <- if (!is.null(layer_def$label_x)) {
         layer_def$label_x 
-      } else if (align_mode == "layer") {
-        sf::st_bbox(tilted_data)["xmin"] - 5
-      } else { # "stack"
-        global_xmin - 5
+      } else if (side == "right") {
+        if (align_mode == "layer") {
+          anchor_x + x_off
+        } else {
+          global_xmax + x_off
+        }
+      } else { # "left"
+        if (align_mode == "layer") {
+          anchor_x - x_off
+        } else {
+          global_xmin - x_off
+        }
       }
       
-      lbl_y <- if (!is.null(layer_def$label_y)) layer_def$label_y else p_curr$y_shift
+      lbl_y <- if (!is.null(layer_def$label_y)) layer_def$label_y else anchor_y + y_off
       lbl_col <- if (!is.null(layer_def$label_color)) layer_def$label_color else stack$defaults$label_color
       lbl_size <- if (!is.null(layer_def$label_size)) layer_def$label_size else stack$defaults$label_size
       
@@ -357,9 +395,9 @@ plot_tilt_stack <- function(stack) {
       } else if (!is.null(stack$defaults$label_hjust)) {
         stack$defaults$label_hjust
       } else if (is.null(layer_def$label_x) && is.null(stack$defaults$label_x)) {
-        1 # Auto-align to left of stack
+        if (side == "right") 0 else 1 # Auto-align to stack edge
       } else {
-        0 # Default left-aligned
+        0.5 # Default centered if manual X provided
       }
 
       if (!is.null(lbl_x) && !is.null(lbl_y)) {
@@ -416,8 +454,13 @@ plot_tilt_stack <- function(stack) {
   p <- p + ggplot2::theme_void()
   if (has_labels) {
     p <- p + 
-      ggplot2::coord_sf(clip = "off") +
-      ggplot2::theme(plot.margin = ggplot2::margin(l = 100)) # Add margin to prevent label truncation
+      ggplot2::coord_sf(clip = "off")
+      
+    # Dynamic margins based on label side
+    lbl_sides <- sapply(stack$layers, function(l) if (!is.null(l$label_side)) l$label_side else stack$defaults$label_side)
+    margin_l <- if (any(lbl_sides == "left")) 150 else 10
+    margin_r <- if (any(lbl_sides == "right")) 150 else 10
+    p <- p + ggplot2::theme(plot.margin = ggplot2::margin(l = margin_l, r = margin_r, t = 10, b = 10))
   }
   p
 }

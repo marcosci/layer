@@ -40,6 +40,8 @@ Suggests:
     rmarkdown
 VignetteBuilder: 
     quarto
+SystemRequirements: 
+    Quarto command line tool (https://github.com/quarto-dev/quarto-cli)
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)

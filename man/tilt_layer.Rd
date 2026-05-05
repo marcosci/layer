@@ -27,7 +27,10 @@ tilt_layer(
   label = NA,
   label_x = NULL,
   label_y = NULL,
+  label_side = NULL,
   label_align = NULL,
+  label_x_offset = NULL,
+  label_y_offset = NULL,
   label_color = NULL,
   label_size = NULL,
   label_family = NULL,
@@ -81,9 +84,15 @@ tilt_layer(
 
 \item{label_x}{X coordinate for the label. If \code{NULL}, inherits from stack defaults.}
 
-\item{label_y}{Y coordinate for the label. If \code{NULL}, inherits from stack defaults or \code{y_shift}.}
+\item{label_y}{Y coordinate for the label. If \code{NULL}, inherits from stack defaults or the layer's visual center.}
+
+\item{label_side}{Side for the label: \code{"left"} or \code{"right"}. If \code{NULL}, inherits from stack defaults.}
 
 \item{label_align}{Alignment for the label: \code{"stack"} or \code{"layer"}. If \code{NULL}, inherits from stack defaults.}
+
+\item{label_x_offset}{Horizontal offset for the label. If \code{NULL}, inherits from stack defaults.}
+
+\item{label_y_offset}{Vertical offset for the label. If \code{NULL}, inherits from stack defaults.}
 
 \item{label_color}{Color for the label. If \code{NULL}, inherits from stack defaults.}
 

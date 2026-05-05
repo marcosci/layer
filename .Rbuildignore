@@ -19,3 +19,6 @@
 ^doc$
 ^Meta$
 ^conductor$
+^vignettes/.*_files$
+^vignettes/.*_cache$
+^vignettes/\.gitignore$
