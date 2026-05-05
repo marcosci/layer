@@ -219,7 +219,7 @@ animate_tilt_stack <- function(stack, type = c("unfold", "reveal"), direction = 
   layer_y_offsets <- lapply(stack$layers, function(l) if (!is.null(l$label_y_offset)) l$label_y_offset else (if (!is.null(stack$defaults$label_y_offset)) stack$defaults$label_y_offset else 0))
 
   if (status$active) {
-    if (verbose) cli::cli_inform(c("i" = "Animation: Using Grouped Parallelism (Layer-bound)"))
+    if (verbose) cli::cli_inform(c("i" = "Animation: Using Grouped Parallelism (Frame-bound)"))
 
     # Broadcast data once
     mirai::everywhere(
@@ -238,33 +238,33 @@ animate_tilt_stack <- function(stack, type = c("unfold", "reveal"), direction = 
       .args = list(.d = layer_data_list, .ll = layer_labels, .ls = layer_sides, .lx = layer_x_offsets, .ly = layer_y_offsets, .p = params_final, .nf = n_frames, .fpl = frames_per_layer, .seq = sequential)
     )
 
-    # Parallel path (one task per layer)
+    # Parallel path (one task per frame)
     results <- mirai::mirai_map(
-      seq_along(stack$layers),
-      function(i) {
-        data <- .L_DATA[[i]]
-        p_final <- .L_PARAMS[[i]]
-        lbl_text <- .L_LABELS[[i]]
-        lbl_side <- .L_SIDES[[i]]
-        x_off <- .L_XOFFS[[i]]
-        y_off <- .L_YOFFS[[i]]
-        
-        if (.L_SEQ) {
-          start_f <- (i - 1) * .L_FPL + 1
-          end_f <- min(.L_NFRAMES, i * .L_FPL)
-        } else {
-          start_f <- 1
-          end_f <- .L_NFRAMES
-        }
-        
-        res_tilted <- list()
-        res_labels <- list()
-        
-        for (f in start_f:.L_NFRAMES) {
+      1:n_frames,
+      function(f) {
+        res_tilted_f <- list()
+        res_labels_f <- list()
+
+        for (i in seq_along(.L_DATA)) {
+          data <- .L_DATA[[i]]
+          p_final <- .L_PARAMS[[i]]
+          lbl_text <- .L_LABELS[[i]]
+          lbl_side <- .L_SIDES[[i]]
+          x_off <- .L_XOFFS[[i]]
+          y_off <- .L_YOFFS[[i]]
+
+          if (.L_SEQ) {
+            start_f <- (i - 1) * .L_FPL + 1
+            end_f <- min(.L_NFRAMES, i * .L_FPL)
+          } else {
+            start_f <- 1
+            end_f <- .L_NFRAMES
+          }
+
+          if (f < start_f) next
+
           if (f <= end_f) {
-            # Animate in (Genie effect)
             weight <- (f - start_f) / max(1, (end_f - start_f))
-            # Interpolate from point at bottom-left origin to final position
             curr_p <- list(
               x_shift = 0 + (p_final$x_shift - 0) * weight,
               y_shift = 0 + (p_final$y_shift - 0) * weight,
@@ -275,10 +275,9 @@ animate_tilt_stack <- function(stack, type = c("unfold", "reveal"), direction = 
               angle_rotate = 0 + (p_final$angle_rotate - 0) * weight
             )
           } else {
-            # Stay final
             curr_p <- p_final
           }
-          
+
           tilted <- layer::tilt_map(
             data,
             x_stretch = curr_p$x_stretch, y_stretch = curr_p$y_stretch,
@@ -287,8 +286,8 @@ animate_tilt_stack <- function(stack, type = c("unfold", "reveal"), direction = 
             angle_rotate = curr_p$angle_rotate
           )
           tilted$.frame <- f
-          res_tilted[[length(res_tilted) + 1]] <- tilted
-          
+          res_tilted_f[[i]] <- tilted
+
           if (!is.na(lbl_text)) {
             coords <- sf::st_coordinates(tilted)
             if (lbl_side == "right") {
@@ -299,8 +298,8 @@ animate_tilt_stack <- function(stack, type = c("unfold", "reveal"), direction = 
               anchor_x <- coords[anchor_idx, "X"] - x_off
             }
             anchor_y <- coords[anchor_idx, "Y"] + y_off
-            
-            res_labels[[length(res_labels) + 1]] <- data.frame(
+
+            res_labels_f[[i]] <- data.frame(
               x = anchor_x,
               y = anchor_y,
               label = lbl_text,
@@ -309,49 +308,63 @@ animate_tilt_stack <- function(stack, type = c("unfold", "reveal"), direction = 
             )
           }
         }
-        list(tilted = do.call(rbind, res_tilted), labels = if (length(res_labels) > 0) do.call(rbind, res_labels) else NULL)
+        list(tilted = res_tilted_f, labels = res_labels_f)
       }
     )
-    
-    layer_results <- results[mirai::.progress]
+
+    frame_results <- results[mirai::.progress]
     mirai::everywhere({
       eval(parse(text = 'rm(".L_DATA", ".L_LABELS", ".L_SIDES", ".L_XOFFS", ".L_YOFFS", ".L_PARAMS", ".L_NFRAMES", ".L_FPL", ".L_SEQ", envir = .GlobalEnv)'))
     })
-    
-    return(list(
-      tilted = lapply(layer_results, `[[`, "tilted"),
-      labels = lapply(layer_results, `[[`, "labels")
-    ))
+
+    if (any(sapply(frame_results, function(x) inherits(x, "error_value")))) {
+      err_idx <- which(sapply(frame_results, function(x) inherits(x, "error_value")))[1]
+      rlang::abort(c("x" = "Error in parallel animation frame generation.",
+                     "i" = sprintf("Worker message: %s", as.character(frame_results[[err_idx]]))))
+    }
+
+    # Reassemble: results is list(n_frames) of list(tilted = list(n_layers), labels = list(n_layers))
+    # We want: list(tilted = list(n_layers), labels = list(n_layers))
+    tilted_finals <- lapply(seq_len(n_layers), function(i) {
+      do.call(rbind, lapply(frame_results, function(res) res$tilted[[i]]))
+    })
+    labels_finals <- lapply(seq_len(n_layers), function(i) {
+      res_list <- lapply(frame_results, function(res) res$labels[[i]])
+      res_list <- Filter(Negate(is.null), res_list)
+      if (length(res_list) > 0) do.call(rbind, res_list) else NULL
+    })
+
+    return(list(tilted = tilted_finals, labels = labels_finals))
   } else {
     # Serial path
     if (verbose) cli::cli_inform(c("i" = "Animation: Using Tier 3 (Serial Execution)"))
-    if (verbose) pb <- cli::cli_progress_bar("Generating frames", total = n_layers)
-    
-    tilted_finals <- list()
-    labels_finals <- list()
-    
-    for (i in seq_along(stack$layers)) {
-      data <- layer_data_list[[i]]
-      p_final <- params_final[[i]]
-      lbl_text <- layer_labels[[i]]
-      lbl_side <- layer_sides[[i]]
-      x_off <- layer_x_offsets[[i]]
-      y_off <- layer_y_offsets[[i]]
-      
-      if (sequential) {
-        start_f <- (i - 1) * frames_per_layer + 1
-        end_f <- min(n_frames, i * frames_per_layer)
-      } else {
-        start_f <- 1
-        end_f <- n_frames
-      }
-      
-      res_tilted <- list()
-      res_labels <- list()
-      
-      for (f in start_f:n_frames) {
+    if (verbose) pb <- cli::cli_progress_bar("Generating frames", total = n_frames)
+
+    # Re-initialize the lists for the final results
+    tilted_finals <- vector("list", n_layers)
+    labels_finals <- vector("list", n_layers)
+
+    # In serial, it is easier to iterate by frame to match progress bar
+    for (f in 1:n_frames) {
+      for (i in seq_along(stack$layers)) {
+        data <- layer_data_list[[i]]
+        p_final <- params_final[[i]]
+        lbl_text <- layer_labels[[i]]
+        lbl_side <- layer_sides[[i]]
+        x_off <- layer_x_offsets[[i]]
+        y_off <- layer_y_offsets[[i]]
+
+        if (sequential) {
+          start_f <- (i - 1) * frames_per_layer + 1
+          end_f <- min(n_frames, i * frames_per_layer)
+        } else {
+          start_f <- 1
+          end_f <- n_frames
+        }
+
+        if (f < start_f) next
+
         if (f <= end_f) {
-          # Animate in (Genie effect)
           weight <- (f - start_f) / max(1, (end_f - start_f))
           curr_p <- list(
             x_shift = 0 + (p_final$x_shift - 0) * weight,
@@ -365,7 +378,7 @@ animate_tilt_stack <- function(stack, type = c("unfold", "reveal"), direction = 
         } else {
           curr_p <- p_final
         }
-        
+
         tilted <- layer::tilt_map(
           data,
           x_stretch = curr_p$x_stretch, y_stretch = curr_p$y_stretch,
@@ -374,8 +387,8 @@ animate_tilt_stack <- function(stack, type = c("unfold", "reveal"), direction = 
           angle_rotate = curr_p$angle_rotate
         )
         tilted$.frame <- f
-        res_tilted[[length(res_tilted) + 1]] <- tilted
-        
+        tilted_finals[[i]] <- rbind(tilted_finals[[i]], tilted)
+
         if (!is.na(lbl_text)) {
           coords <- sf::st_coordinates(tilted)
           if (lbl_side == "right") {
@@ -386,18 +399,17 @@ animate_tilt_stack <- function(stack, type = c("unfold", "reveal"), direction = 
             anchor_x <- coords[anchor_idx, "X"] - x_off
           }
           anchor_y <- coords[anchor_idx, "Y"] + y_off
-          
-          res_labels[[length(res_labels) + 1]] <- data.frame(
+
+          new_lbl <- data.frame(
             x = anchor_x,
             y = anchor_y,
             label = lbl_text,
             .frame = f,
             stringsAsFactors = FALSE
           )
+          labels_finals[[i]] <- rbind(labels_finals[[i]], new_lbl)
         }
       }
-      tilted_finals[[i]] <- do.call(rbind, res_tilted)
-      labels_finals[[i]] <- if (length(res_labels) > 0) do.call(rbind, res_labels) else NULL
       if (verbose) cli::cli_progress_update(id = pb)
     }
     return(list(tilted = tilted_finals, labels = labels_finals))
@@ -423,7 +435,7 @@ animate_tilt_stack <- function(stack, type = c("unfold", "reveal"), direction = 
   }
 
   if (status$active) {
-    if (verbose) cli::cli_inform(c("i" = "Animation: Using Grouped Parallelism (Layer-bound)"))
+    if (verbose) cli::cli_inform(c("i" = "Animation: Using Grouped Parallelism (Frame-bound)"))
 
     # Broadcast data once
     mirai::everywhere(
@@ -443,31 +455,32 @@ animate_tilt_stack <- function(stack, type = c("unfold", "reveal"), direction = 
       .args = list(.d = layer_data_list, .ll = layer_labels, .ls = layer_sides, .lx = layer_x_offsets, .ly = layer_y_offsets, .p = params_final, .pa = p_anchor, .nf = n_frames, .fpl = frames_per_layer, .seq = sequential)
     )
 
-    # Parallel path (one task per layer)
+    # Parallel path (one task per frame)
     results <- mirai::mirai_map(
-      seq_along(stack$layers),
-      function(i) {
-        data <- .L_DATA[[i]]
-        p_final <- .L_PARAMS[[i]]
-        p_anchor <- .L_ANCHOR
-        lbl_text <- .L_LABELS[[i]]
-        lbl_side <- .L_SIDES[[i]]
-        x_off <- .L_XOFFS[[i]]
-        y_off <- .L_YOFFS[[i]]
-        n_frames <- .L_NFRAMES
-        
-        if (.L_SEQ) {
-          start_f <- (i - 1) * .L_FPL + 1
-          end_f <- min(.L_NFRAMES, i * .L_FPL)
-        } else {
-          start_f <- 1
-          end_f <- .L_NFRAMES
-        }
-        
-        res_tilted <- list()
-        res_labels <- list()
-        
-        for (f in start_f:n_frames) {
+      1:n_frames,
+      function(f) {
+        res_tilted_f <- list()
+        res_labels_f <- list()
+
+        for (i in seq_along(.L_DATA)) {
+          data <- .L_DATA[[i]]
+          p_final <- .L_PARAMS[[i]]
+          p_anchor <- .L_ANCHOR
+          lbl_text <- .L_LABELS[[i]]
+          lbl_side <- .L_SIDES[[i]]
+          x_off <- .L_XOFFS[[i]]
+          y_off <- .L_YOFFS[[i]]
+
+          if (.L_SEQ) {
+            start_f <- (i - 1) * .L_FPL + 1
+            end_f <- min(.L_NFRAMES, i * .L_FPL)
+          } else {
+            start_f <- 1
+            end_f <- .L_NFRAMES
+          }
+
+          if (f < start_f) next
+
           if (f <= end_f) {
             weight <- (f - start_f) / max(1, (end_f - start_f))
             curr_p <- list(
@@ -482,17 +495,17 @@ animate_tilt_stack <- function(stack, type = c("unfold", "reveal"), direction = 
           } else {
             curr_p <- p_final
           }
-          
+
           tilted <- layer::tilt_map(
-            data, 
-            x_stretch = curr_p$x_stretch, y_stretch = curr_p$y_stretch, 
-            x_tilt = curr_p$x_tilt, y_tilt = curr_p$y_tilt, 
-            x_shift = curr_p$x_shift, y_shift = curr_p$y_shift, 
+            data,
+            x_stretch = curr_p$x_stretch, y_stretch = curr_p$y_stretch,
+            x_tilt = curr_p$x_tilt, y_tilt = curr_p$y_tilt,
+            x_shift = curr_p$x_shift, y_shift = curr_p$y_shift,
             angle_rotate = curr_p$angle_rotate
           )
           tilted$.frame <- f
-          res_tilted[[length(res_tilted) + 1]] <- tilted
-          
+          res_tilted_f[[i]] <- tilted
+
           if (!is.na(lbl_text)) {
             coords <- sf::st_coordinates(tilted)
             if (lbl_side == "right") {
@@ -503,8 +516,8 @@ animate_tilt_stack <- function(stack, type = c("unfold", "reveal"), direction = 
               anchor_x <- coords[anchor_idx, "X"] - x_off
             }
             anchor_y <- coords[anchor_idx, "Y"] + y_off
-            
-            res_labels[[length(res_labels) + 1]] <- data.frame(
+
+            res_labels_f[[i]] <- data.frame(
               x = anchor_x,
               y = anchor_y,
               label = lbl_text,
@@ -513,53 +526,59 @@ animate_tilt_stack <- function(stack, type = c("unfold", "reveal"), direction = 
             )
           }
         }
-        list(tilted = do.call(rbind, res_tilted), labels = if (length(res_labels) > 0) do.call(rbind, res_labels) else NULL)
+        list(tilted = res_tilted_f, labels = res_labels_f)
       }
     )
-    
-    layer_results <- results[mirai::.progress]
+
+    frame_results <- results[mirai::.progress]
     mirai::everywhere({
       eval(parse(text = 'rm(".L_DATA", ".L_LABELS", ".L_SIDES", ".L_XOFFS", ".L_YOFFS", ".L_PARAMS", ".L_NFRAMES", ".L_FPL", ".L_SEQ", envir = .GlobalEnv)'))
     })
 
-    if (any(sapply(layer_results, function(x) inherits(x, "error_value")))) {
-      err_idx <- which(sapply(layer_results, function(x) inherits(x, "error_value")))[1]
-      rlang::abort(c("x" = "Error in parallel animation frame generation.", 
-                     "i" = sprintf("Worker message: %s", as.character(layer_results[[err_idx]]))))
+    if (any(sapply(frame_results, function(x) inherits(x, "error_value")))) {
+      err_idx <- which(sapply(frame_results, function(x) inherits(x, "error_value")))[1]
+      rlang::abort(c("x" = "Error in parallel animation frame generation.",
+                     "i" = sprintf("Worker message: %s", as.character(frame_results[[err_idx]]))))
     }
-    
-    return(list(
-      tilted = lapply(layer_results, `[[`, "tilted"),
-      labels = lapply(layer_results, `[[`, "labels")
-    ))
+
+    # Reassemble
+    tilted_finals <- lapply(seq_len(n_layers), function(i) {
+      do.call(rbind, lapply(frame_results, function(res) res$tilted[[i]]))
+    })
+    labels_finals <- lapply(seq_len(n_layers), function(i) {
+      res_list <- lapply(frame_results, function(res) res$labels[[i]])
+      res_list <- Filter(Negate(is.null), res_list)
+      if (length(res_list) > 0) do.call(rbind, res_list) else NULL
+    })
+
+    return(list(tilted = tilted_finals, labels = labels_finals))
   } else {
     # Serial path
     if (verbose) cli::cli_inform(c("i" = "Animation: Using Tier 3 (Serial Execution)"))
-    if (verbose) pb <- cli::cli_progress_bar("Generating frames", total = n_layers)
-    
-    tilted_finals <- list()
-    labels_finals <- list()
-    
-    for (i in seq_along(stack$layers)) {
-      data <- layer_data_list[[i]]
-      p_final <- params_final[[i]]
-      lbl_text <- layer_labels[[i]]
-      lbl_side <- layer_sides[[i]]
-      x_off <- layer_x_offsets[[i]]
-      y_off <- layer_y_offsets[[i]]
-      
-      if (sequential) {
-        start_f <- (i - 1) * frames_per_layer + 1
-        end_f <- min(n_frames, i * frames_per_layer)
-      } else {
-        start_f <- 1
-        end_f <- n_frames
-      }
-      
-      res_tilted <- list()
-      res_labels <- list()
-      
-      for (f in start_f:n_frames) {
+    if (verbose) pb <- cli::cli_progress_bar("Generating frames", total = n_frames)
+
+    tilted_finals <- vector("list", n_layers)
+    labels_finals <- vector("list", n_layers)
+
+    for (f in 1:n_frames) {
+      for (i in seq_along(stack$layers)) {
+        data <- layer_data_list[[i]]
+        p_final <- params_final[[i]]
+        lbl_text <- layer_labels[[i]]
+        lbl_side <- layer_sides[[i]]
+        x_off <- layer_x_offsets[[i]]
+        y_off <- layer_y_offsets[[i]]
+
+        if (sequential) {
+          start_f <- (i - 1) * frames_per_layer + 1
+          end_f <- min(n_frames, i * frames_per_layer)
+        } else {
+          start_f <- 1
+          end_f <- n_frames
+        }
+
+        if (f < start_f) next
+
         if (f <= end_f) {
           weight <- (f - start_f) / max(1, (end_f - start_f))
           curr_p <- list(
@@ -576,8 +595,8 @@ animate_tilt_stack <- function(stack, type = c("unfold", "reveal"), direction = 
         }
         tilted <- layer::tilt_map(data, x_stretch = curr_p$x_stretch, y_stretch = curr_p$y_stretch, x_tilt = curr_p$x_tilt, y_tilt = curr_p$y_tilt, x_shift = curr_p$x_shift, y_shift = curr_p$y_shift, angle_rotate = curr_p$angle_rotate)
         tilted$.frame <- f
-        res_tilted[[length(res_tilted) + 1]] <- tilted
-        
+        tilted_finals[[i]] <- rbind(tilted_finals[[i]], tilted)
+
         if (!is.na(lbl_text)) {
           coords <- sf::st_coordinates(tilted)
           if (lbl_side == "right") {
@@ -588,18 +607,17 @@ animate_tilt_stack <- function(stack, type = c("unfold", "reveal"), direction = 
             anchor_x <- coords[anchor_idx, "X"] - x_off
           }
           anchor_y <- coords[anchor_idx, "Y"] + y_off
-          
-          res_labels[[length(res_labels) + 1]] <- data.frame(
+
+          new_lbl <- data.frame(
             x = anchor_x,
             y = anchor_y,
             label = lbl_text,
             .frame = f,
             stringsAsFactors = FALSE
           )
+          labels_finals[[i]] <- rbind(labels_finals[[i]], new_lbl)
         }
       }
-      tilted_finals[[i]] <- do.call(rbind, res_tilted)
-      labels_finals[[i]] <- if (length(res_labels) > 0) do.call(rbind, res_labels) else NULL
       if (verbose) cli::cli_progress_update(id = pb)
     }
     return(list(tilted = tilted_finals, labels = labels_finals))
