@@ -72,6 +72,7 @@ tilt_stack <- function(
 #' @param begin Start of interval for palette.
 #' @param end End of interval for palette.
 #' @param alpha Opacity of the layer.
+#' @param downsample Integer; if > 0, downsamples raster/stars data by this factor using `stars::st_downsample()` before processing.
 #' @param size Size/linewidth of the points or lines in the layer. If `NULL`, defaults to `0.01` for the first layer and `0.5` for others.
 #' @param label Optional text label to annotate the layer.
 #' @param label_x X coordinate for the label. If `NULL`, inherits from stack defaults.
@@ -97,6 +98,7 @@ tilt_layer <- function(
   x_shift_rel = NULL, y_shift_rel = NULL,
   x_stretch = NULL, y_stretch = NULL, x_tilt = NULL, y_tilt = NULL, angle_rotate = NULL,
   fill = "value", color = "grey50", palette = "viridis", direction = 1, begin = 0, end = 1, alpha = 1,
+  downsample = 0,
   size = NULL,
   label = NA, label_x = NULL, label_y = NULL, label_side = NULL, label_align = NULL,
   label_x_offset = NULL, label_y_offset = NULL,
@@ -104,6 +106,13 @@ tilt_layer <- function(
   label_family = NULL, label_fontface = NULL, label_alpha = NULL,
   label_hjust = NULL, label_vjust = NULL, label_lineheight = NULL
 ) {
+  if (downsample > 0) {
+    if (inherits(data, c("RasterLayer", "RasterStack", "RasterBrick", "stars", "SpatRaster"))) {
+      if (!inherits(data, "stars")) data <- stars::st_as_stars(data)
+      data <- stars::st_downsample(data, n = downsample)
+    }
+  }
+
   layer_def <- list(
     data = data,
     x_shift = x_shift, y_shift = y_shift,

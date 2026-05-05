@@ -23,6 +23,7 @@ tilt_layer(
   begin = 0,
   end = 1,
   alpha = 1,
+  downsample = 0,
   size = NULL,
   label = NA,
   label_x = NULL,
@@ -77,6 +78,8 @@ tilt_layer(
 \item{end}{End of interval for palette.}
 
 \item{alpha}{Opacity of the layer.}
+
+\item{downsample}{Integer; if > 0, downsamples raster/stars data by this factor using \code{stars::st_downsample()} before processing.}
 
 \item{size}{Size/linewidth of the points or lines in the layer. If \code{NULL}, defaults to \code{0.01} for the first layer and \code{0.5} for others.}
 

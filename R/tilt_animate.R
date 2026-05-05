@@ -35,8 +35,9 @@ tilt_match <- function(data, stack, layer = 1) {
 .get_mirai_status <- function() {
   if (!requireNamespace("mirai", quietly = TRUE)) return(list(active = FALSE))
   
-  # Check for active daemons using the official developer interface
-  active <- mirai::daemons_set()
+  # Check for active daemons
+  s <- mirai::status()
+  active <- s$connections > 0
   
   if (!active) return(list(active = FALSE))
   
@@ -49,7 +50,7 @@ tilt_match <- function(data, stack, layer = 1) {
     ))
   }
   
-  list(active = TRUE, has_mori = has_mori)
+  list(active = TRUE, has_mori = has_mori, daemons = s$connections)
 }
 
 #' Animate a tilt stack
@@ -101,14 +102,73 @@ animate_tilt_stack <- function(stack, type = c("unfold", "reveal"), direction = 
 
   # Pre-convert all data to SF on the host for stability
   if (verbose) cli::cli_progress_step("Preparing spatial data")
-  for (i in seq_along(stack$layers)) {
-    d <- stack$layers[[i]]$data
-    if (!inherits(d, "sf")) {
-      stack$layers[[i]]$data <- sf::st_as_sf(stars::st_as_stars(d))
+  
+  status <- .get_mirai_status()
+  
+  needs_conv <- sapply(stack$layers, function(l) !inherits(l$data, "sf"))
+  
+  if (status$active && any(needs_conv)) {
+    # Aggressive Parallel preparation: bundle all chunks of all layers into one map
+    mirai::everywhere({
+      loadNamespace("sf")
+      loadNamespace("stars")
+    })
+    
+    n_daemons <- status$daemons
+    all_chunks <- list()
+    chunk_map <- integer() # To track which chunk belongs to which layer
+    
+    conv_indices <- which(needs_conv)
+    
+    for (i in conv_indices) {
+      d <- stack$layers[[i]]$data
+      if (!inherits(d, "stars")) d <- stars::st_as_stars(d)
+      
+      dims <- dim(d)
+      y_dim_idx <- which(names(dims) == "y")
+      if (length(y_dim_idx) == 0) y_dim_idx <- 2
+      
+      n_y <- dims[y_dim_idx]
+      # Split each layer into n_daemons chunks to ensure full utilization
+      chunk_size <- ceiling(n_y / n_daemons)
+      
+      for (j in 1:n_daemons) {
+        y_start <- (j - 1) * chunk_size + 1
+        y_end <- min(n_y, j * chunk_size)
+        if (y_start > n_y) break
+        
+        # Extract chunk
+        ch <- if (y_dim_idx == 1) d[y_start:y_end, ] else if (y_dim_idx == 2) d[, y_start:y_end] else d[, , y_start:y_end]
+        
+        all_chunks[[length(all_chunks) + 1]] <- ch
+        chunk_map <- c(chunk_map, i)
+      }
+    }
+    
+    # Convert ALL chunks across ALL layers in one single parallel pass
+    converted_all <- mirai::mirai_map(
+      all_chunks,
+      function(ch) {
+        # Convert to sf INSIDE the worker to parallelize the 3.5-minute wait
+        suppressMessages(sf::st_as_sf(stars::st_as_stars(ch)))
+      }
+    )[]
+    
+    # Reassemble layers
+    for (i in conv_indices) {
+      layer_chunks <- converted_all[chunk_map == i]
+      stack$layers[[i]]$data <- do.call(rbind, layer_chunks)
+    }
+    
+  } else {
+    # Serial preparation
+    for (i in seq_along(stack$layers)) {
+      d <- stack$layers[[i]]$data
+      if (!inherits(d, "sf")) {
+        stack$layers[[i]]$data <- sf::st_as_sf(stars::st_as_stars(d))
+      }
     }
   }
-
-  status <- .get_mirai_status()
   
   if (status$active) {
     # Ensure workers have necessary packages loaded
@@ -242,8 +302,8 @@ animate_tilt_stack <- function(stack, type = c("unfold", "reveal"), direction = 
     results <- mirai::mirai_map(
       1:n_frames,
       function(f) {
-        res_tilted_f <- list()
-        res_labels_f <- list()
+        res_tilted_f <- vector("list", length(.L_DATA))
+        res_labels_f <- vector("list", length(.L_DATA))
 
         for (i in seq_along(.L_DATA)) {
           data <- .L_DATA[[i]]
@@ -314,25 +374,62 @@ animate_tilt_stack <- function(stack, type = c("unfold", "reveal"), direction = 
 
     frame_results <- results[mirai::.progress]
     mirai::everywhere({
-      eval(parse(text = 'rm(".L_DATA", ".L_LABELS", ".L_SIDES", ".L_XOFFS", ".L_YOFFS", ".L_PARAMS", ".L_NFRAMES", ".L_FPL", ".L_SEQ", envir = .GlobalEnv)'))
-    })
+      eval(parse(text = 'rm(".L_DATA", ".L_LABELS", ".L_SIDES", ".L_XOFFS", ".L_YOFFS", ".L_PARAMS", ".L_NFRAMES", ".L_FPL", ".L_SEQ", ".L_ANCHOR", envir = .GlobalEnv, inherits = FALSE)'))
+    }, .args = list())
 
-    if (any(sapply(frame_results, function(x) inherits(x, "error_value")))) {
-      err_idx <- which(sapply(frame_results, function(x) inherits(x, "error_value")))[1]
+    # Check for errors using the robust mirai check
+    is_err <- sapply(frame_results, mirai::is_error_value)
+    if (any(is_err)) {
+      err_idx <- which(is_err)[1]
       rlang::abort(c("x" = "Error in parallel animation frame generation.",
                      "i" = sprintf("Worker message: %s", as.character(frame_results[[err_idx]]))))
     }
 
     # Reassemble: results is list(n_frames) of list(tilted = list(n_layers), labels = list(n_layers))
-    # We want: list(tilted = list(n_layers), labels = list(n_layers))
-    tilted_finals <- lapply(seq_len(n_layers), function(i) {
-      do.call(rbind, lapply(frame_results, function(res) res$tilted[[i]]))
-    })
-    labels_finals <- lapply(seq_len(n_layers), function(i) {
-      res_list <- lapply(frame_results, function(res) res$labels[[i]])
-      res_list <- Filter(Negate(is.null), res_list)
-      if (length(res_list) > 0) do.call(rbind, res_list) else NULL
-    })
+    tilted_finals <- vector("list", n_layers)
+    labels_finals <- vector("list", n_layers)
+
+    for (i in seq_len(n_layers)) {
+      # Extract tilted data for layer i across all frames
+      t_list <- lapply(seq_along(frame_results), function(idx) {
+        res <- frame_results[[idx]]
+        if (!is.list(res)) {
+          cli::cli_abort("Frame {idx} result is not a list (Class: {class(res)[1]}).")
+        }
+        
+        # Check if 'tilted' exists and is a list
+        if (!("tilted" %in% names(res))) return(NULL)
+        t_field <- res[["tilted"]]
+        
+        # This is where the error likely happens. Let's be very careful.
+        if (is.list(t_field)) {
+          if (length(t_field) >= i) return(t_field[[i]])
+        } else {
+           # If for some reason it is not a list, maybe it is a single sf object?
+           if (i == 1 && inherits(t_field, "sf")) return(t_field)
+        }
+        return(NULL)
+      })
+      t_list <- Filter(Negate(is.null), t_list)
+      if (length(t_list) > 0) tilted_finals[[i]] <- do.call(rbind, t_list)
+
+      # Extract labels for layer i across all frames
+      l_list <- lapply(seq_along(frame_results), function(idx) {
+        res <- frame_results[[idx]]
+        if (!is.list(res)) return(NULL)
+        if (!("labels" %in% names(res))) return(NULL)
+        l_field <- res[["labels"]]
+        
+        if (is.list(l_field)) {
+          if (length(l_field) >= i) return(l_field[[i]])
+        } else {
+           if (i == 1 && is.data.frame(l_field)) return(l_field)
+        }
+        return(NULL)
+      })
+      l_list <- Filter(Negate(is.null), l_list)
+      if (length(l_list) > 0) labels_finals[[i]] <- do.call(rbind, l_list)
+    }
 
     return(list(tilted = tilted_finals, labels = labels_finals))
   } else {
@@ -459,8 +556,8 @@ animate_tilt_stack <- function(stack, type = c("unfold", "reveal"), direction = 
     results <- mirai::mirai_map(
       1:n_frames,
       function(f) {
-        res_tilted_f <- list()
-        res_labels_f <- list()
+        res_tilted_f <- vector("list", length(.L_DATA))
+        res_labels_f <- vector("list", length(.L_DATA))
 
         for (i in seq_along(.L_DATA)) {
           data <- .L_DATA[[i]]
@@ -532,24 +629,62 @@ animate_tilt_stack <- function(stack, type = c("unfold", "reveal"), direction = 
 
     frame_results <- results[mirai::.progress]
     mirai::everywhere({
-      eval(parse(text = 'rm(".L_DATA", ".L_LABELS", ".L_SIDES", ".L_XOFFS", ".L_YOFFS", ".L_PARAMS", ".L_NFRAMES", ".L_FPL", ".L_SEQ", envir = .GlobalEnv)'))
-    })
+      eval(parse(text = 'rm(".L_DATA", ".L_LABELS", ".L_SIDES", ".L_XOFFS", ".L_YOFFS", ".L_PARAMS", ".L_NFRAMES", ".L_FPL", ".L_SEQ", ".L_ANCHOR", envir = .GlobalEnv, inherits = FALSE)'))
+    }, .args = list())
 
-    if (any(sapply(frame_results, function(x) inherits(x, "error_value")))) {
-      err_idx <- which(sapply(frame_results, function(x) inherits(x, "error_value")))[1]
+    # Check for errors using the robust mirai check
+    is_err <- sapply(frame_results, mirai::is_error_value)
+    if (any(is_err)) {
+      err_idx <- which(is_err)[1]
       rlang::abort(c("x" = "Error in parallel animation frame generation.",
                      "i" = sprintf("Worker message: %s", as.character(frame_results[[err_idx]]))))
     }
 
-    # Reassemble
-    tilted_finals <- lapply(seq_len(n_layers), function(i) {
-      do.call(rbind, lapply(frame_results, function(res) res$tilted[[i]]))
-    })
-    labels_finals <- lapply(seq_len(n_layers), function(i) {
-      res_list <- lapply(frame_results, function(res) res$labels[[i]])
-      res_list <- Filter(Negate(is.null), res_list)
-      if (length(res_list) > 0) do.call(rbind, res_list) else NULL
-    })
+    # Reassemble: results is list(n_frames) of list(tilted = list(n_layers), labels = list(n_layers))
+    tilted_finals <- vector("list", n_layers)
+    labels_finals <- vector("list", n_layers)
+
+    for (i in seq_len(n_layers)) {
+      # Extract tilted data for layer i across all frames
+      t_list <- lapply(seq_along(frame_results), function(idx) {
+        res <- frame_results[[idx]]
+        if (!is.list(res)) {
+          cli::cli_abort("Frame {idx} result is not a list (Class: {class(res)[1]}).")
+        }
+        
+        # Check if 'tilted' exists and is a list
+        if (!("tilted" %in% names(res))) return(NULL)
+        t_field <- res[["tilted"]]
+        
+        # This is where the error likely happens. Let's be very careful.
+        if (is.list(t_field)) {
+          if (length(t_field) >= i) return(t_field[[i]])
+        } else {
+           # If for some reason it is not a list, maybe it is a single sf object?
+           if (i == 1 && inherits(t_field, "sf")) return(t_field)
+        }
+        return(NULL)
+      })
+      t_list <- Filter(Negate(is.null), t_list)
+      if (length(t_list) > 0) tilted_finals[[i]] <- do.call(rbind, t_list)
+
+      # Extract labels for layer i across all frames
+      l_list <- lapply(seq_along(frame_results), function(idx) {
+        res <- frame_results[[idx]]
+        if (!is.list(res)) return(NULL)
+        if (!("labels" %in% names(res))) return(NULL)
+        l_field <- res[["labels"]]
+        
+        if (is.list(l_field)) {
+          if (length(l_field) >= i) return(l_field[[i]])
+        } else {
+           if (i == 1 && is.data.frame(l_field)) return(l_field)
+        }
+        return(NULL)
+      })
+      l_list <- Filter(Negate(is.null), l_list)
+      if (length(l_list) > 0) labels_finals[[i]] <- do.call(rbind, l_list)
+    }
 
     return(list(tilted = tilted_finals, labels = labels_finals))
   } else {
