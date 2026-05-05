@@ -8,13 +8,13 @@
   "codeRepository": "https://github.com/marcosci/layer",
   "issueTracker": "https://github.com/marcosci/layer/issues",
   "license": "https://spdx.org/licenses/CC0-1.0",
-  "version": "0.0.4",
+  "version": "0.0.4.9000",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.5.2 (2025-10-31)",
+  "runtimePlatform": "R version 4.6.0 (2026-04-24)",
   "provider": {
     "@id": "https://cran.r-project.org",
     "@type": "Organization",
@@ -67,6 +67,80 @@
       "@id": "https://orcid.org/0000-0001-6690-5345"
     }
   ],
+  "softwareSuggestions": [
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "gganimate",
+      "name": "gganimate",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=gganimate"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "knitr",
+      "name": "knitr",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=knitr"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "mirai",
+      "name": "mirai",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=mirai"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "mori",
+      "name": "mori",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=mori"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "quarto",
+      "name": "quarto",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=quarto"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "rmarkdown",
+      "name": "rmarkdown",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=rmarkdown"
+    }
+  ],
   "softwareRequirements": {
     "1": {
       "@type": "SoftwareApplication",
@@ -75,6 +149,18 @@
       "version": ">= 2.10"
     },
     "2": {
+      "@type": "SoftwareApplication",
+      "identifier": "cli",
+      "name": "cli",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=cli"
+    },
+    "3": {
       "@type": "SoftwareApplication",
       "identifier": "dplyr",
       "name": "dplyr",
@@ -86,7 +172,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=dplyr"
     },
-    "3": {
+    "4": {
       "@type": "SoftwareApplication",
       "identifier": "furrr",
       "name": "furrr",
@@ -98,7 +184,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=furrr"
     },
-    "4": {
+    "5": {
       "@type": "SoftwareApplication",
       "identifier": "ggnewscale",
       "name": "ggnewscale",
@@ -110,7 +196,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=ggnewscale"
     },
-    "5": {
+    "6": {
       "@type": "SoftwareApplication",
       "identifier": "ggplot2",
       "name": "ggplot2",
@@ -122,7 +208,19 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=ggplot2"
     },
-    "6": {
+    "7": {
+      "@type": "SoftwareApplication",
+      "identifier": "lifecycle",
+      "name": "lifecycle",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=lifecycle"
+    },
+    "8": {
       "@type": "SoftwareApplication",
       "identifier": "magrittr",
       "name": "magrittr",
@@ -134,7 +232,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=magrittr"
     },
-    "7": {
+    "9": {
       "@type": "SoftwareApplication",
       "identifier": "raster",
       "name": "raster",
@@ -146,7 +244,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=raster"
     },
-    "8": {
+    "10": {
       "@type": "SoftwareApplication",
       "identifier": "rlang",
       "name": "rlang",
@@ -158,7 +256,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=rlang"
     },
-    "9": {
+    "11": {
       "@type": "SoftwareApplication",
       "identifier": "scico",
       "name": "scico",
@@ -170,7 +268,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=scico"
     },
-    "10": {
+    "12": {
       "@type": "SoftwareApplication",
       "identifier": "sf",
       "name": "sf",
@@ -182,7 +280,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=sf"
     },
-    "11": {
+    "13": {
       "@type": "SoftwareApplication",
       "identifier": "stars",
       "name": "stars",
@@ -194,7 +292,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=stars"
     },
-    "12": {
+    "14": {
       "@type": "SoftwareApplication",
       "identifier": "tidyr",
       "name": "tidyr",
@@ -208,8 +306,8 @@
     },
     "SystemRequirements": null
   },
-  "fileSize": "709.881KB",
-  "releaseNotes": "https://github.com/marcosci/layer/blob/master/NEWS.md",
+  "fileSize": "2865.471KB",
+  "releaseNotes": "https://github.com/marcosci/layer/blob/main/NEWS.md",
   "readme": "https://github.com/marcosci/layer/blob/main/README.md",
   "contIntegration": "https://github.com/marcosci/layer/actions/workflows/R-CMD-check.yaml",
   "developmentStatus": "https://www.repostatus.org/#active",

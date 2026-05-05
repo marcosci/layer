@@ -1,0 +1,216 @@
+---
+title: "Get Started with {layer}"
+vignette: >
+  %\VignetteIndexEntry{Get Started with {layer}}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+execute:
+  eval: true
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    code-overflow: wrap
+---
+
+# Introduction
+
+`{layer}` is an R package designed to simplify the creation of stacked tilted maps, commonly used in scientific publications to visualize spatial correlations across different environmental layers.
+
+The package provides a declarative API to easily build map stacks, handle spatial transformations (tilting, shifting, and stretching), and automatically generate connecting lines between layers with perfect 3D occlusion.
+
+# Basic Usage
+
+The core of the package is the `tilt_stack()` system. You initialize a stack, add map layers with `tilt_layer()`, and optionally add connecting pins with `tilt_connector()`.
+
+Load relevant packages:
+
+```{r}
+library(layer)
+library(sf)
+library(ggplot2)
+```
+
+## Simple Stack Example
+
+Here is how to create a basic 3-layer stack using the built-in landscape data:
+
+
+```{r}
+# Initialize a stack with a global vertical step
+tilt_stack(y_shift_step = 50) |>
+  tilt_layer(landscape_1, palette = "bilbao", label = "Bottom") |>
+  tilt_layer(landscape_2, palette = "mako", label = "Middle") |>
+  tilt_layer(landscape_3, palette = "rocket", label = "Top")
+```
+
+## How it Works
+
+- **`tilt_stack()`**: Defines global defaults for the stack, such as the shift step between layers and default labels positioning.
+- **`tilt_layer()`**: Adds a raster or vector layer. It inherits global spatial parameters unless overridden. The `label` argument automatically places text next to the layer in 3D space.
+- **`tilt_connector()`**: Takes a set of points and automatically calculates their positions on every layer in the stack, drawing vertical connecting lines that respect the 3D occlusion. By default, lines are interleaved between layers (`on_top = FALSE`), but can be forced to the front with `on_top = TRUE`.
+
+### Typography Control
+
+The package provides full control over the appearance of layer labels. You can set global defaults in `tilt_stack()` or override them for specific layers in `tilt_layer()`. You can also seamlessly integrate connectors with custom styling:
+
+```{r}
+tilt_stack(
+  y_shift_step = 50,
+  label_family = "serif",
+  label_fontface = "bold",
+  label_color = "black",
+  label_alpha = 0.8
+) |>
+  # Add styled connector lines
+  tilt_connector(landscape_points, color = "grey40", linewidth = 1.2) |>
+  tilt_layer(landscape_1, label = "Layer 1") |>
+  tilt_layer(landscape_2, label = "Layer 2", label_color = "red") # Override
+```
+
+
+The available parameters follow `ggplot2` naming conventions: `label_family`, `label_fontface`, `label_alpha`, `label_hjust`, `label_vjust`, and `label_lineheight`.
+
+### Dynamic Label Alignment
+
+When creating a stack, you can control how labels are aligned relative to the tilted planes using the `label_align` argument. This is especially useful when using horizontal shifts (`x_shift_step`).
+
+There are two primary modes:
+
+1.  **`"stack"` (Default):** All labels align to the leftmost edge of the *entire* stack. This creates a neat, perfectly vertical margin on the left side of the plot.
+2.  **`"layer"`:** Each label aligns to the leftmost edge of its *specific* tilted layer. As layers shift to the right, their labels move with them.
+
+#### Global Alignment
+Set the default behavior for the whole stack in `tilt_stack()`:
+
+```{r}
+# All labels will track their specific layers by default
+tilt_stack(x_shift_step = 50, y_shift_step = 50, label_align = "layer") |>
+  tilt_layer(landscape_1, label = "Bottom") |>
+  tilt_layer(landscape_2, label = "Middle") |>
+  tilt_layer(landscape_3, label = "Top")
+```
+
+#### Per-Layer Override
+You can also mix and match alignment styles by overriding the global default in `tilt_layer()`:
+
+```{r}
+tilt_stack(x_shift_step = 50, y_shift_step = 50, label_align = "stack") |>
+  tilt_layer(landscape_1, label = "Stay Left") |>
+  tilt_layer(landscape_2, label = "Track Layer", label_align = "layer") |>
+  tilt_layer(landscape_3, label = "Stay Left")
+```
+
+::: {.callout-note}
+Note that when `label_x` is not provided, the engine automatically sets `label_hjust = 1` (right-justified) to keep the text neatly "pointing" at the layers. If you provide an explicit `label_x`, the alignment logic is bypassed and the label is placed exactly where you specify.
+:::
+
+### Connector Styling
+
+Just like labels, connectors can be styled using standard `ggplot2` aesthetics. You can change the color, thickness (`linewidth`), line pattern, and customize the appearance of the points on the top layer:
+
+```{r}
+tilt_stack(y_shift_step = 50) |>
+  tilt_layer(landscape_1) |>
+  tilt_connector(
+    landscape_points,
+    color = "grey60",
+    linewidth = 0.5, # Connector thickness
+    linetype = "dashed", # Dashed connector lines
+    point_shape = 21, # Filled circle with border
+    point_fill = "red", # Red center
+    point_color = "black", # Black border
+    point_stroke = .5 # Border thickness
+  ) |>
+  tilt_layer(landscape_2)
+```
+
+### Global vs. Local Connectors
+
+The `tilt_connector()` function is "position-aware" within your pipeline:
+
+1.  **Global Connectors:** If added at the very beginning or end of your stack, the connector pierces through **every** layer gap.
+2.  **Local Connectors:** If added between two specific `tilt_layer()` calls, it only draws connecting lines for that specific gap.
+
+```{r}
+# Generate some sample points
+points_global <- st_sf(id = 1, geometry = st_sfc(st_point(c(25, 25))))
+points_local <- st_sf(id = 2, geometry = st_sfc(st_point(c(75, 75))))
+
+# Example of mixed connectors
+tilt_stack(x_shift_step = 50, y_shift_step = 50) |>
+  # Global: Pierces the entire stack
+  tilt_connector(points_global, color = "black", linewidth = 1.5) |>
+
+  tilt_layer(landscape_1, label = "Bottom") |>
+
+  # Local: Only connects the Bottom to the Middle layer
+  tilt_connector(points_local, color = "red", linewidth = 1.5) |>
+
+  tilt_layer(landscape_2, label = "Middle") |>
+  tilt_layer(landscape_3, label = "Top")
+```
+
+# Advanced: Reproducing Complex Figures
+
+The package is powerful enough to recreate complex, multi-sourced spatial visualizations. Because of the built-in S3 print method, simply running the pipeline in your console will automatically render the final 3D visualization. 
+Note that if you wish to save the resulting `ggplot` object to a variable without printing it immediately, you can still use the explicit `plot_tilt_stack()` function:
+
+```{r}
+# Initialize a complete stack and save the result
+my_plot <- tilt_stack(y_shift_step = 50) |>
+  tilt_layer(landscape_1, palette = "bilbao", label = "Bottom") |>
+  tilt_layer(landscape_2, palette = "mako", label = "Middle") |>
+  tilt_layer(landscape_3, palette = "rocket", label = "Top") |>
+  plot_tilt_stack() # Explicit plotting
+```
+
+### Performance & Re-rendering
+
+The new API uses **lazy evaluation**. Spatial transformations are not calculated when you define a layer with `tilt_layer()`, but rather performed once when you call `plot_tilt_stack()` (or when the stack is printed).
+
+The resulting object is a standard `ggplot` object containing the already-tilted geometry. This allows you to tweak the styling (themes, labels, titles) without waiting for the 3D math to run again. Note that while this avoids the computational overhead of the 3D projection, the actual rendering time in `ggplot2` still depends on the complexity of your data.
+
+::: {.callout-important}
+Note that the `tilt_stack` object itself does not cache individual layers. If you add a 3rd layer to a 2-layer stack and plot it again, all three layers will be re-calculated from scratch.
+:::
+
+```{r}
+# This re-renders instantly because the 3D tilting is already "frozen" in my_plot
+my_plot +
+  theme_minimal() +
+  theme(
+    axis.title = element_blank(),
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank(),
+    plot.margin = margin(l = 150, r = 10, t = 10, b = 10)
+  ) +
+  labs(title = "My Tilted Map Stack", subtitle = "Rendered efficiently")
+```
+
+```{r}
+# Fully declarative pipeline (auto-renders)
+...
+tilt_stack(x_shift_step = 0, y_shift_step = 25, label_color = "gray40") |>
+  tilt_layer(landscape_1, palette = "YlOrRd", label = "Terrain") |>
+  tilt_layer(landscape_2, palette = "cividis", label = "Population") |>
+  tilt_layer(landscape_1, fill = NA, color = "gray50", label = "Boundaries") |>
+  tilt_layer(landscape_points, color = "black", y_shift_rel = 50) |>
+  tilt_layer(landscape_3, palette = "viridis", label = "Accessibility")
+```
+
+# Legacy API (Deprecated)
+
+Before the introduction of the `tilt_stack` system, users had to manually tilt each layer using `tilt_map()` and then combine them in a list for `plot_tiltedmaps()`. This approach is now **deprecated** as it requires manual coordinate tracking and doesn't support automated 3D occlusion for connectors.
+
+```{r}
+# The old, manual way (deprecated)
+l1 <- tilt_map(landscape_1)
+l2 <- tilt_map(landscape_2, x_shift = 25, y_shift = 50)
+plot_tiltedmaps(list(l1, l2), palette = c("bilbao", "mako"))
+```
+
+# Conclusion
+
+The `{layer}` package removes the manual math usually required for 3D map stacks in R. By using a declarative pipeline, your code stays readable, and the system automatically handles shears, rotations, and perfect 3D occlusion for you.

@@ -16,7 +16,6 @@
 #' Code adopted from https://www.mzes.uni-mannheim.de/socialsciencedatalab/article/geospatial-data/.
 #'
 #' @return An `sf` object with tilted and shifted data.
-#' @importFrom magrittr "%>%"
 #' @import raster
 #' @export
 #' @examples
@@ -31,53 +30,56 @@ tilt_map <- function(data,
                      angle_rotate = pi/20,
                      boundary = NULL,
                      parallel = FALSE) {
-  
-  if (!any(class(data) %in% c("sf", "sfg"))) {
-    data <- stars::st_as_stars(data)
+
+  # Affine matrices
+  shear_mat <- matrix(c(x_stretch, y_stretch, x_tilt, y_tilt), 2, 2)
+  rotate_mat <- matrix(c(cos(angle_rotate), sin(angle_rotate), -sin(angle_rotate), cos(angle_rotate)), 2, 2)
+  full_mat <- shear_mat %*% rotate_mat
+
+  if (!any(class(data) %in% c("sf", "sfc", "sfg"))) {
+    # It is a raster/stars object
+    if (!inherits(data, "stars")) data <- stars::st_as_stars(data)
+    
+    # Apply affine transformation directly to stars metadata
+    d <- stars::st_dimensions(data)
+    
+    # In stars, affine transformation is represented in the geotransform
+    # We update the delta and affine components
+    # Original: x = off_x + i*dx, y = off_y + j*dy
+    # New: [x, y] = [off_x, off_y] + [i, j] %*% Matrix
+    
+    # This is a bit complex in stars directly, so we convert to sf 
+    # BUT we do it after the parameters are resolved if possible.
+    # Actually, stars support for arbitrary affine in plot is limited in ggplot.
+    # The most stable way that is still fast is to convert to sf 
+    # and then apply the matrix to the whole sfc at once (vectorized).
+    
+    # We ensure we only convert to sf ONCE.
     data <- sf::st_as_sf(data)
   }
 
-  shear_matrix <- function(x) {
-    matrix(c(x_stretch, y_stretch, x_tilt, y_tilt), 2, 2)
-  }
-
-  rotate_matrix <- function(x) {
-    matrix(c(cos(x), sin(x), -sin(x), cos(x)), 2, 2)
-  }
-
   if(!is.null(boundary)) data <- create_outline(boundary, data)
-  
-  if(parallel == TRUE){
-    
-  geom_func <- function(data, x_stretch, y_stretch, x_tilt, y_tilt, x_shift, y_shift){
-    sf::st_geometry(data) <- sf::st_geometry(data) * shear_matrix() * rotate_matrix(angle_rotate) + c(x_shift, y_shift) 
-    data <- data %>% sf::st_as_sf()
-    }
-    
-  data <- data %>%
-    dplyr::group_by(group = (dplyr::row_number()-1) %/% (dplyr::n()/10))%>%
-    tidyr::nest() %>% 
-    dplyr::pull(data) %>%
-    furrr::future_map(~geom_func(data = .,
-                                          x_stretch = x_stretch,
-                                          y_stretch = y_stretch,
-                                          x_tilt = x_tilt,
-                                          y_tilt = y_tilt,
-                                          x_shift = x_shift,
-                                          y_shift = y_shift)) %>% 
-    dplyr::bind_rows() %>% 
-    sf::st_as_sf()
-  
+
+  if (inherits(data, "sf")) {
+    # Apply transformation to the entire geometry column at once (very fast)
+    sf::st_geometry(data) <- sf::st_geometry(data) * full_mat + c(x_shift, y_shift)
+  } else {
+    # For sfc and sfg
+    data <- data * full_mat + c(x_shift, y_shift)
+  }
+
+  if(length(names(data)) > 1) {
+    # Ensure the value column is named correctly for downstream use
+    if (!("geometry" %in% names(data))) {
+       # Find geometry column if not named geometry
+       geom_col <- attr(data, "sf_column")
+       if (names(data)[1] != geom_col) names(data)[1] <- "value"
     } else {
-    
-    sf::st_geometry(data) <- sf::st_geometry(data) * shear_matrix() * rotate_matrix(angle_rotate) + c(x_shift, y_shift)
-  
+       if (names(data)[1] != "geometry") names(data)[1] <- "value"
     }
-  
-  if(length(names(data)) > 1) names(data)[1] <- "value"
-  
+  }
+
   return(data)
-  
 }
 
 create_outline <- function(outline_from, outline_to){
@@ -95,9 +97,9 @@ create_outline <- function(outline_from, outline_to){
   outline_shape <- sf::st_union(sf::st_buffer(outline_from, dist = 0))
   outline_shape <- sf::st_as_sf(sf::st_cast(sf::st_as_sf(outline_shape), 'MULTILINESTRING'))
   
-  current = attr(outline_shape, "sf_column")
-  names(outline_shape)[names(outline_shape)==current] = "geometry"
-  sf::st_geometry(outline_shape) = "geometry"
+  current <- attr(outline_shape, "sf_column")
+  names(outline_shape)[names(outline_shape) == current] <- "geometry"
+  sf::st_geometry(outline_shape) <- "geometry"
   
   if(length(names(outline_to)) > 1) {
     

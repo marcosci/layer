@@ -20,7 +20,7 @@ plot_tiltedmaps(
 
 \item{layer}{vector or list of names of each column in tilted sf object that should be used for coloring}
 
-\item{palette}{vector of palettes provided by the \link[viridis]{viridis} and \link[scico]{scico} packages for rasters}
+\item{palette}{vector of palettes provided by the \link[viridis]{viridis} and \link[scico]{scico} package for rasters}
 
 \item{color}{a single color applied multiple times or a vector of color strings for points or linestrings}
 
@@ -36,6 +36,11 @@ plot_tiltedmaps(
 A \code{ggplot} object with stacked maps.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
+
+\code{plot_tiltedmaps()} was deprecated in layer 0.1.0 in favor of the new \code{\link[=tilt_stack]{tilt_stack()}} API.
+It remains available for now but further development will focus on the new declarative system.
+
 Takes tilted maps and plots them with ggplot.
 }
 \examples{

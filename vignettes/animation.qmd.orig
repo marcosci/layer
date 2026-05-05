@@ -1,0 +1,160 @@
+---
+title: "Animating Stacked Maps"
+vignette: >
+  %\VignetteIndexEntry{Animating Stacked Maps}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+execute:
+  eval: true
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    code-overflow: wrap
+---
+
+```{r setup, include=FALSE}
+# Ensure animations and progress bars stay out of the rendered documentation
+options(gganimate.verbose = FALSE)
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+# Introduction
+
+One of the most visually striking uses of stacked maps is to animate the "infolding" or "revealing" of the layers. `{layer}` provides a high-level API to create these animations with a single function call, while remaining fully compatible with `{gganimate}` for more advanced scenarios.
+
+# Quick Start: High-Level Animation
+
+The easiest way to animate a stack is using `animate_tilt_stack()`. It takes a `tilt_stack` object and generates a `gganimate` object.
+
+There are two primary animation types:
+
+1.  **`"unfold"` (Default):** All layers transition from a flat 2D state to their final 3D positions simultaneously.
+2.  **`"reveal"`:** Layers appear and transition into place one by one.
+
+```{r}
+library(layer)
+library(sf)
+library(ggplot2)
+library(gganimate)
+
+# Load base data
+data("landscape_1")
+data("landscape_2")
+data("landscape_3")
+
+# Define a standard stack with left-side labels (default)
+stack <- tilt_stack(y_shift_step = 50, label_side = "left") |>
+  tilt_layer(landscape_1, palette = "bilbao", label = "Bottom") |>
+  tilt_layer(landscape_2, palette = "mako", label = "Middle") |>
+  tilt_layer(landscape_3, palette = "rocket", label = "Top")
+
+# Create a snappier, smoother "reveal" animation
+# We use more frames for smoothness but higher FPS for speed
+# sequential = FALSE makes all layers reveal simultaneously
+# library(mirai) ; mirai::daemons(4) # use this to generate on 4 CPU cores or more, adjust to you liking, animate_tilt_stack will automatically detect the daemons you set here
+anim <- animate_tilt_stack(stack, type = "reveal", n_frames = 45, sequential = FALSE)
+# mirai::daemons(0) remember to shutdown the daemons when you are done
+
+# Render the animation at 50 FPS for high-speed fluid motion
+animate(anim, fps = 50, renderer = gifski_renderer(), verbose = FALSE)
+```
+
+# Advanced: Custom Movement & Matching Data
+
+While `animate_tilt_stack()` handles the most common use cases, you can also build custom animations by manually tilting your data. This is particularly useful when you have moving objects (like vehicles or wildlife) that need to stay "pinned" to a specific layer.
+
+## Setup for Custom Animation
+
+We'll generate a synthetic transport network with 3 different routes and multiple vehicles.
+
+::: {.callout-note}
+Inspired by Rafael Pereira's [Animating public transport networks on 3D stacked maps](https://www.urbandemographics.org/post/animating-transport-networks-3d-maps/).
+:::
+
+```{r}
+library(layer)
+library(sf)
+library(ggplot2)
+library(gganimate)
+
+# Load base data
+data("landscape_1")
+data("landscape_2")
+
+# Create 3 fake routes (A, B, C)
+routes_list <- list(
+  A = st_linestring(matrix(c(10, 10, 90, 90), ncol = 2, byrow = TRUE)),
+  B = st_linestring(matrix(c(10, 90, 90, 10), ncol = 2, byrow = TRUE)),
+  C = st_linestring(matrix(c(50, 0, 50, 100), ncol = 2, byrow = TRUE))
+)
+routes_sf <- st_sf(route_id = names(routes_list), geometry = st_sfc(routes_list))
+
+# Generate 50 frames of movement for each route
+n_frames <- 50
+vehicles <- do.call(rbind, lapply(names(routes_list), function(id) {
+  pts <- st_line_sample(routes_list[[id]], n = n_frames, type = "regular") |> st_cast("POINT")
+  st_sf(route_id = id, time = 1:n_frames, geometry = pts)
+}))
+```
+
+# Building the Static Foundation
+
+We use the declarative `tilt_stack()` API to build the 3D environment. We'll place the transport routes on the top layer (`y_shift = 50`) using a gray dotted line.
+
+```{r}
+# Define the stack with right-side labels (Step = 25 -> L1:0, L2:25, L3:50)
+map_stack <- tilt_stack(y_shift_step = 25, label_side = "right") |>
+  tilt_layer(landscape_1, palette = "bilbao", label = "Terrain") |>
+  tilt_layer(landscape_2, palette = "mako", label = "Population") |>
+  tilt_layer(routes_sf, color = "gray70", label = "Transport Network")
+
+# Render and manually override for dotted lines
+base_plot <- plot_tilt_stack(map_stack)
+base_plot$layers[[length(base_plot$layers)]]$aes_params$linetype <- "dotted"
+base_plot$layers[[length(base_plot$layers)]]$aes_params$linewidth <- 0.8
+base_plot
+```
+
+# Preparing the Animated Points
+
+To animate the vehicles, we tilt their coordinates to match the 3rd layer of our stack.
+
+```{r}
+# Tilt vehicles to match Layer 3
+vehicles_tilted <- tilt_match(vehicles, map_stack, layer = 3)
+
+# Convert to data frame for gganimate performance
+vehicles_df <- data.frame(
+  route_id = vehicles$route_id,
+  time = vehicles$time,
+  x = st_coordinates(vehicles_tilted)[, 1],
+  y = st_coordinates(vehicles_tilted)[, 2]
+)
+```
+
+# Assembling the Animation
+
+Finally, we append the moving points and `gganimate` instructions.
+
+```{r}
+#| message: false
+#| warning: false
+animated_plot <- base_plot +
+  ggnewscale::new_scale_color() +
+  geom_point(data = vehicles_df, aes(x = x, y = y, color = route_id), size = 4) +
+  scale_color_brewer(palette = "Set1", guide = "none") +
+  transition_time(time) +
+  shadow_wake(wake_length = 0.1) +
+  ease_aes('linear')
+
+# Render at 50 FPS
+animate(animated_plot, nframes = 50, fps = 50, renderer = gifski_renderer(), verbose = FALSE)
+```
+
+# Why this works
+
+Because `plot_tilt_stack()` returns a standard `ggplot` object, we can continue to add layers and scales to it. By manually tilting the "dynamic" data using the same shift parameters as our "static" layers, we ensure everything remains perfectly aligned in the 3D perspective.

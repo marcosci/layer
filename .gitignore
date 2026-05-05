@@ -6,3 +6,10 @@
 private
 .Renviron
 revdep
+inst/doc
+/doc/
+/Meta/
+.Rprofile
+conductor/
+/docs/
+.DS_Store

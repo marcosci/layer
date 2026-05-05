@@ -23,7 +23,7 @@ src="https://cranlogs.r-pkg.org/badges/layer?color=blue"
 alt="CRAN/METACRAN Downloads per month" /></a>
 [![R-CMD-check](https://github.com/marcosci/layer/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/marcosci/layer/actions/workflows/R-CMD-check.yaml)
 
-[![DOI](https://zenodo.org/badge/DOI/10.32614/CRAN.package.layer.svg)](https://doi.org/10.32614/CRAN.package.layer)
+[![](https://zenodo.org/badge/DOI/10.32614/CRAN.package.layer.svg)](https://doi.org/10.32614/CRAN.package.layer)
 
 <!-- badges: end -->
 
@@ -55,17 +55,11 @@ This is a basic example which shows you how to solve a common problem:
 ``` r
 library(layer)
 
-tilt_landscape_1 <- tilt_map(landscape_1)
-tilt_landscape_2 <- tilt_map(landscape_2, x_shift = 25, y_shift = 50)
-tilt_landscape_3 <- tilt_map(landscape_3, x_shift = 50, y_shift = 100)
-tilt_landscape_points <- tilt_map(landscape_points, x_shift = 75, y_shift = 150)
-
-map_list <- list(tilt_landscape_1, tilt_landscape_2, tilt_landscape_3, tilt_landscape_points)
-
-plot_tiltedmaps(map_list,
-                layer = c("value", "value", "value", NA),
-                palette = c("bilbao", "mako", "rocket", NA),
-                color = "grey40")
+tilt_stack(x_shift_step = 25, y_shift_step = 50) |>
+  tilt_layer(landscape_1, palette = "bilbao") |>
+  tilt_layer(landscape_2, palette = "mako") |>
+  tilt_layer(landscape_3, palette = "rocket") |>
+  tilt_connector(landscape_points, color = "grey40")
 ```
 
 <img src="man/figures/README-example-1.png"
@@ -77,14 +71,11 @@ Some more realistic looking data (DEM, drought, precipitation, and
 wildfires for continental USA):
 
 ``` r
-tilt_landscape_1 <- tilt_map(dem_usa, y_tilt = 3)
-tilt_landscape_2 <- tilt_map(drought_usa, y_tilt = 3, x_shift = 15, y_shift = 25)
-tilt_landscape_3 <- tilt_map(prec_usa, y_tilt = 3, x_shift = 30, y_shift = 50)
-tilt_landscape_4 <- tilt_map(fire_usa, y_tilt = 3, x_shift = 45, y_shift = 65)
-
-map_list <- list(tilt_landscape_1, tilt_landscape_2, tilt_landscape_3, tilt_landscape_4)
-
-plot_tiltedmaps(map_list, palette = c("tofino", "rocket", "mako", "magma"), direction = c(-1, 1, 1, 1))
+tilt_stack(y_tilt = 3, x_shift_step = 15, y_shift_step = 25) |>
+  tilt_layer(dem_usa, palette = "tofino", direction = -1) |>
+  tilt_layer(drought_usa, palette = "rocket") |>
+  tilt_layer(prec_usa, palette = "mako") |>
+  tilt_layer(fire_usa, palette = "magma")
 ```
 
 <img src="man/figures/README-adv-example.png"
